@@ -51,7 +51,7 @@ namespace SmartFlow.Services
 
             var users = GetAll(appUsersFilePath);
 
-            var user = users.FirstOrDefault(x => x.Username == username.Trim().ToLower());
+            var user = users.FirstOrDefault();
 
             if (user == null)
             {

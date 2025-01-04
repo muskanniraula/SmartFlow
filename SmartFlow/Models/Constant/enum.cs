@@ -27,10 +27,11 @@ namespace SmartFlow.Models.Constant
 
     public enum PreferredCurrency
     {
-        None = 0,
-        NPR = 1,
-        INR = 2,
-        USD = 3,
-        DHR = 4,
+        NPR,
+        USD,
+        EUR,
+        GBP,
+        INR
     }
+
 }

@@ -24,7 +24,7 @@ namespace SmartFlow.Components.Pages
 
             try
             {
-                UserService.Login(UserService.SeedUsername, UserService.SeedPassword);
+                UserService.Login(Username, Password);
             }
             catch (Exception e)
             {
