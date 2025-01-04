@@ -20,11 +20,22 @@ namespace SmartFlow.Components.Pages
         {
             try
             {
+                // Check if the username already exists
+                var existingUser = UserService.GetAll(UtilityService.GetAppUsersFilePath())
+                                             .FirstOrDefault(u => u.Username.Equals(Username, StringComparison.OrdinalIgnoreCase));
+
+                if (existingUser != null)
+                {
+                    _errorMessage = "Username already exists. Please choose another one.";
+                    return; // Exit the method without creating a new user
+                }
+
+                // Proceed to create a new user if the username doesn't exist
                 var user = UserService.Create(Guid.NewGuid(), Username, Password, Currency);
 
                 if (user != null)
                 {
-                    Navigation.NavigateTo("/home");
+                    Navigation.NavigateTo("/"); // Navigate to login page after successful registration
                 }
             }
             catch (Exception e)
@@ -35,3 +46,4 @@ namespace SmartFlow.Components.Pages
         }
     }
 }
+

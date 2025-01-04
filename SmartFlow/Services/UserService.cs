@@ -90,20 +90,20 @@ namespace SmartFlow.Services
         /// <param name="role">User's Role</param>
         /// <returns>An updated list of user with a new created user</returns>
         /// <exception cref="Exception"></exception>
-        public static List<User> Create(Guid userId, string username, string password, PreferredCurrency currency)
+        public static List<User> Create(Guid userId, string Username, string Password, PreferredCurrency currency)
         {
-            username = username.Trim();
+            Username = Username.Trim();
 
-            if (username == "" || password == "")
+            if (Username == "" || Password == "")
             {
                 throw new Exception("Please insert correct and valid input for each of the fields.");
             }
 
             var users = GetAll(appUsersFilePath);
 
-            var usernameExists = users.Any(x => x.Username == username);
+            var UsernameExists = users.Any(x => x.Username == Username);
 
-            if (usernameExists)
+            if (UsernameExists)
             {
                 throw new Exception("Username already exists. Please choose any other username.");
             }
@@ -112,8 +112,8 @@ namespace SmartFlow.Services
 
             var user = new User()
             {
-                Username = username,
-                Password = UtilityService.HashSecret(password),
+                Username = Username,
+                Password = UtilityService.HashSecret(Password),
                 currency = currency,
                 CreatedBy = userId,
             };

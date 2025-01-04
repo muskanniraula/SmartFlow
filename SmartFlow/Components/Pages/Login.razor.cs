@@ -37,18 +37,17 @@ namespace SmartFlow.Components.Pages
         {
             try
             {
-                var user = UserService.Login(Username, Password);
+                var user = UserService.Login(Username, Password);  // Attempt to login
 
-                if (user != null)
-                {
-                    NavManager.NavigateTo("/home");
-                }
+                // If login is successful, navigate to the home page
+                Navigation.NavigateTo("/home");  // Redirect to home after successful login
             }
             catch (Exception e)
             {
-                _errorMessage = e.Message;
-                Console.WriteLine(e);
+                _errorMessage = e.Message;  // Display error message if login fails
+                Console.WriteLine(e.Message);
             }
         }
+
     }
 }
