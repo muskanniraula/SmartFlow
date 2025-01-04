@@ -1,0 +1,39 @@
+@* @inject JsonPersistenceService PersistenceService *@
+
+@* <MudCard Class="pa-4" Outlined="true"> *@
+@*     <MudCardContent> *@
+@*         <MudText Typo="Typo.h5" Align="Align.Center">Dashboard</MudText> *@
+@*         <MudTable Items="transactions" Class="mt-4" Bordered="true" Striped="true"> *@
+@*             <HeaderContent> *@
+@*                 <MudTh>Type</MudTh> *@
+@*                 <MudTh>Amount</MudTh> *@
+@*                 <MudTh>Date</MudTh> *@
+@*             </HeaderContent> *@
+@*             <RowTemplate> *@
+@*                 <MudTd>@context.Type</MudTd> *@
+@*                 <MudTd>@context.Amount.ToString("C")</MudTd> *@
+@*                 <MudTd>@context.Date.ToString("dd MMM yyyy")</MudTd> *@
+@*             </RowTemplate> *@
+@*             <NoRecordsContent> *@
+@*                 <MudText Typo="Typo.body1" Align="Align.Center">No transactions found.</MudText> *@
+@*             </NoRecordsContent> *@
+@*         </MudTable> *@
+@*     </MudCardContent> *@
+@* </MudCard> *@
+
+@* @code { *@
+@*     private List<Transaction> transactions; *@
+@*     private string ErrorMessage; *@
+
+@*     protected override async Task OnInitializedAsync() *@
+@*     { *@
+@*         try *@
+@*         { *@
+@*             transactions = await PersistenceService.LoadData<Transaction>("transactions.json") ?? new List<Transaction>(); *@
+@*         } *@
+@*         catch (Exception ex) *@
+@*         { *@
+@*             ErrorMessage = $"Error loading transactions: {ex.Message}"; *@
+@*         } *@
+@*     } *@
+@* } *@

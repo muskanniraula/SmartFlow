@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using MudBlazor.Services;
+
 
 namespace SmartFlow
 {
@@ -14,11 +16,16 @@ namespace SmartFlow
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
+            // Add Blazor WebView
             builder.Services.AddMauiBlazorWebView();
 
+            // Add MudBlazor services
+            builder.Services.AddMudServices();
+
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+
+            builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();
