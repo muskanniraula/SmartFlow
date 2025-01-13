@@ -142,4 +142,7 @@
     border-radius: 4px;
     background: white;
 }
-
+.dashboard_heading{
+    font-size: 16px;
+    font-weight: 500;
+}

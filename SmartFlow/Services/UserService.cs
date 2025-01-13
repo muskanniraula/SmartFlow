@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using SmartFlow.Models;
 using SmartFlow.Models.Constant;
 
@@ -51,7 +46,7 @@ namespace SmartFlow.Services
 
             var users = GetAll(appUsersFilePath);
 
-            var user = users.FirstOrDefault();
+            var user = users.FirstOrDefault(u => u.Username == username);
 
             if (user == null)
             {

@@ -13,7 +13,6 @@ namespace SmartFlow.Components.Pages
         [CascadingParameter]
 
         private string Username { get; set; }
-
         private string Password { get; set; }
         private string currency { get; set; }
 
