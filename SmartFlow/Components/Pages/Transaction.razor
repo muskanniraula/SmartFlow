@@ -12,6 +12,45 @@
 
 <button class="btn btn-primary" @onclick="OpenModal">Add Transaction</button>
 <div class="row mb-3">
+    <!-- Total Transactions Card -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Transactions</h5>
+                <p class="card-text h4">@TotalTransactions</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Balance Card -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Balance</h5>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @TotalBalance</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inflow Transactions Card -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Inflow</h5>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @TotalInflow</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Outflow Transactions Card -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Outflow</h5>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @TotalOutflow</p>
+            </div>
+        </div>
+    </div>
     <div class="col-md-3">
         <label>Search by Name</label>
         <input type="text" class="form-control" @bind="SearchQuery" placeholder="Search by Name" />
@@ -155,6 +194,10 @@
 <TransactionModal Visible="@isModalVisible" OnAddTransaction="AddTransaction" />
 
 @code {
+    private int TotalTransactions { get; set; } = 0; // Total number of transactions
+    private decimal TotalBalance { get; set; } = 0; // Total balance
+    private decimal TotalInflow { get; set; } = 0; // Total inflow (Credit)
+    private decimal TotalOutflow { get; set; } = 0; // Total outflow (Debit)
     private bool IsLogout;
     private string SearchQuery = "";
     private string ErrorMessage;
@@ -191,6 +234,7 @@
         transactions = TransactionService.GetAllTransactions();
         FilteredTransactions = transactions;
         CalculateTotals();
+        UpdateDashboardMetrics();
     }
 
     private void OpenAddTransactionModal()
@@ -345,10 +389,13 @@
     }
     private void CalculateTotals()
     {
-        totalIncome = transactions.Where(t => t.Type == "Income").Sum(t => t.Amount);
-        totalExpense = transactions.Where(t => t.Type == "Expense").Sum(t => t.Amount);
-        totalDebt = transactions.Where(t => t.Type == "Debt").Sum(t => t.Amount);
-        totalBalance = totalIncome + totalDebt - totalExpense;
+        TotalInflow = transactions.Where(t => t.Type == "Credit").Sum(t => t.Amount);
+        TotalOutflow = transactions.Where(t => t.Type == "Debit").Sum(t => t.Amount);
+        TotalBalance = TotalInflow - TotalOutflow;
+    }
+    private void UpdateDashboardMetrics()
+    {
+        TotalTransactions = transactions.Count;
     }
 
 
