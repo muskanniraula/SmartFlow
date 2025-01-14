@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SmartFlow.Services
 {
@@ -50,7 +48,7 @@ namespace SmartFlow.Services
         }
 
         /// <summary>
-        /// Initializing a method so as to retrieve the directory path to store all the records and logs
+        /// Initializes a method to retrieve the directory path to store all the records and logs.
         /// </summary>
         /// <returns>Path of the directory that holds all the application data</returns>
         public static string GetAppDirectoryPath()
@@ -77,5 +75,17 @@ namespace SmartFlow.Services
         {
             return Path.Combine(GetAppDirectoryPath(), "debts.json");
         }
+
+        /// <summary>
+        /// Ensures that the directory for storing application files exists.
+        /// </summary>
+        public static void EnsureDirectoryExists()
+        {
+            var directoryPath = GetAppDirectoryPath();
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath); // Create the directory if it doesn't exist
+            }
+        }
     }
-    }
+}

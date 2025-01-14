@@ -1,6 +1,4 @@
 @page "/transaction"
-
-<h3>Transactions</h3>
 <nav class="nav">
     <a class="nav-link active" @onclick="NavigateToDashboard">Dashboard</a>
     <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
@@ -9,7 +7,54 @@
         <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
     </div>
 </nav>
+
+<h3>Transactions</h3>
+
 <button class="btn btn-primary" @onclick="OpenModal">Add Transaction</button>
+<div class="row mb-3">
+    <div class="col-md-3">
+        <label>Transaction Type</label>
+        <select class="form-control" @bind="FilterType">
+            <option value="All">All</option>
+            <option value="Credit">Credit</option>
+            <option value="Debit">Debit</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label>Category</label>
+        <input type="text" class="form-control" @bind="FilterCategory" />
+    </div>
+
+    <div class="col-md-3">
+        <label>Tags</label>
+        <input type="text" class="form-control" @bind="FilterTags" />
+    </div>
+
+    <div class="col-md-3">
+        <label>From Date</label>
+        <input type="date" class="form-control" @bind="FilterFromDate" />
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <label>To Date</label>
+        <input type="date" class="form-control" @bind="FilterToDate" />
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-primary mt-4" @onclick="FilterTransactions">Apply Filters</button>
+    </div>
+</div>
+
+<!-- Sorting Button -->
+<button class="btn btn-outline-secondary mb-3" @onclick="ToggleSortOrder">
+    Sort By Date (@(IsDescending ? "Descending" : "Ascending"))
+</button>
+
+
+
+
 
 <table class="table mt-3">
     <thead>
@@ -26,7 +71,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var transaction in transactions)
+        @foreach (var transaction in FilteredTransactions)
         {
             <tr>
                 <td>@transaction.Name</td>
@@ -107,6 +152,32 @@
 
 @code {
     private bool IsLogout;
+    private string ErrorMessage;
+    private decimal totalIncome;
+    private decimal totalExpense;
+    private decimal totalDebt;
+    private decimal totalBalance;
+    private Boolean showModal;
+    private DateTime? FilterFromDate = null;
+    private DateTime? FilterToDate = null;
+    private Models.Transaction newtransaction = new();
+    private Models.Debt newdebt = new();
+    private List<Models.Transaction> transactions = new List<Models.Transaction>();
+    private List<Models.Transaction> FilteredTransactions = new List<Models.Transaction>();
+    private bool isModalVisible = false;
+
+    // Filter properties
+    private string FilterType = "All";
+    private string FilterCategory = "";
+    private string FilterTags = "";
+    private DateTime StartDate = DateTime.MinValue;
+    private DateTime EndDate = DateTime.Now;
+    private bool IsDescending = true;
+
+
+
+
+
     private void NavigateToTransaction()
     {
         Nav.NavigateTo("/Transaction");
@@ -129,21 +200,10 @@
         IsLogout = true;
     }
 
-    private string ErrorMessage;
-    private decimal totalIncome;
-    private decimal totalExpense;
-    private decimal totalDebt;
-    private decimal totalBalance;
-    private Boolean showModal;
-    private Models.Transaction newtransaction = new();
-    private Models.Debt newdebt = new();
-
-    private List<Models.Transaction> transactions;
-    private bool isModalVisible = false;
-
     protected override async Task OnInitializedAsync()
     {
         transactions = TransactionService.GetAllTransactions();
+        FilteredTransactions = transactions;
         CalculateTotals();
     }
 
@@ -164,6 +224,56 @@
             // Handle failure
         }
     }
+
+    // Filter transactions based on selected criteria
+    private void FilterTransactions()
+    {
+        FilteredTransactions = transactions;
+
+        if (FilterType != "All")
+        {
+            FilteredTransactions = FilteredTransactions.Where(t => t.Type == FilterType).ToList();
+        }
+
+        if (!string.IsNullOrEmpty(FilterCategory))
+        {
+            FilteredTransactions = FilteredTransactions
+                .Where(t => t.Category.Contains(FilterCategory, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        if (!string.IsNullOrEmpty(FilterTags))
+        {
+            FilteredTransactions = FilteredTransactions
+                .Where(t => t.Tags.Contains(FilterTags, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        if (FilterFromDate.HasValue)
+        {
+            FilteredTransactions = FilteredTransactions.Where(t => t.Date >= FilterFromDate.Value).ToList();
+        }
+
+        if (FilterToDate.HasValue)
+        {
+            FilteredTransactions = FilteredTransactions.Where(t => t.Date <= FilterToDate.Value).ToList();
+        }
+
+        SortTransactions();
+    }
+
+    private void SortTransactions()
+    {
+        FilteredTransactions = IsDescending
+            ? FilteredTransactions.OrderByDescending(t => t.Date).ToList()
+            : FilteredTransactions.OrderBy(t => t.Date).ToList();
+    }
+
+    private void ToggleSortOrder()
+    {
+        IsDescending = !IsDescending;
+        SortTransactions();
+    }
+
+
     private void OpenModal()
     {
         newtransaction = new Models.Transaction { Date = DateTime.Now };
