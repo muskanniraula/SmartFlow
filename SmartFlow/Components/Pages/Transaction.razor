@@ -13,6 +13,10 @@
 <button class="btn btn-primary" @onclick="OpenModal">Add Transaction</button>
 <div class="row mb-3">
     <div class="col-md-3">
+        <label>Search by Name</label>
+        <input type="text" class="form-control" @bind="SearchQuery" placeholder="Search by Name" />
+    </div>
+    <div class="col-md-3">
         <label>Transaction Type</label>
         <select class="form-control" @bind="FilterType">
             <option value="All">All</option>
@@ -152,6 +156,7 @@
 
 @code {
     private bool IsLogout;
+    private string SearchQuery = "";
     private string ErrorMessage;
     private decimal totalIncome;
     private decimal totalExpense;
@@ -175,25 +180,6 @@
     private bool IsDescending = true;
 
 
-
-
-
-    private void NavigateToTransaction()
-    {
-        Nav.NavigateTo("/Transaction");
-    }
-    private void NavigateToDashboard()
-    {
-        Nav.NavigateTo("/dashboard");
-    }
-    private void NavigateToDebt()
-    {
-        Nav.NavigateTo("/Debt");
-    }
-    private void NavigateToLogin()
-    {
-        Nav.NavigateTo("/login");
-    }
 
     private void ShowLogoutConfirmation()
     {
@@ -230,23 +216,27 @@
     {
         FilteredTransactions = transactions;
 
+        // Filter by type
         if (FilterType != "All")
         {
             FilteredTransactions = FilteredTransactions.Where(t => t.Type == FilterType).ToList();
         }
 
+        // Filter by category
         if (!string.IsNullOrEmpty(FilterCategory))
         {
             FilteredTransactions = FilteredTransactions
                 .Where(t => t.Category.Contains(FilterCategory, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
+        // Filter by tags
         if (!string.IsNullOrEmpty(FilterTags))
         {
             FilteredTransactions = FilteredTransactions
                 .Where(t => t.Tags.Contains(FilterTags, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
+        // Filter by date range
         if (FilterFromDate.HasValue)
         {
             FilteredTransactions = FilteredTransactions.Where(t => t.Date >= FilterFromDate.Value).ToList();
@@ -257,6 +247,14 @@
             FilteredTransactions = FilteredTransactions.Where(t => t.Date <= FilterToDate.Value).ToList();
         }
 
+        // Search by name
+        if (!string.IsNullOrEmpty(SearchQuery))
+        {
+            FilteredTransactions = FilteredTransactions
+                .Where(t => t.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        // Apply sorting
         SortTransactions();
     }
 
@@ -351,6 +349,27 @@
         totalExpense = transactions.Where(t => t.Type == "Expense").Sum(t => t.Amount);
         totalDebt = transactions.Where(t => t.Type == "Debt").Sum(t => t.Amount);
         totalBalance = totalIncome + totalDebt - totalExpense;
+    }
+
+
+
+
+
+    private void NavigateToTransaction()
+    {
+        Nav.NavigateTo("/Transaction");
+    }
+    private void NavigateToDashboard()
+    {
+        Nav.NavigateTo("/dashboard");
+    }
+    private void NavigateToDebt()
+    {
+        Nav.NavigateTo("/Debt");
+    }
+    private void NavigateToLogin()
+    {
+        Nav.NavigateTo("/login");
     }
 
 }
