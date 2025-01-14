@@ -1,5 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
+using SmartFlow.Interface;
+using SmartFlow.Models;
+using SmartFlow.Services;
+using SmartFlow.Services.Interface;
 
 
 namespace SmartFlow
@@ -21,6 +25,11 @@ namespace SmartFlow
 
             // Add MudBlazor services
             builder.Services.AddMudServices();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ITransactionService, TransactionService>();
+            builder.Services.AddScoped<IDebtService, DebtService>();
+            builder.Services.AddScoped<GlobalState>();
+
 
 #if DEBUG
 

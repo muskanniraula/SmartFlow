@@ -9,7 +9,7 @@ namespace SmartFlow.Services
 {
     public static class UtilityService
     {
-        private const char _segmentDelimiter = ':';
+        private const char segmentDelimiter = ':';
 
         public static string HashSecret(this string input)
         {
@@ -21,7 +21,7 @@ namespace SmartFlow.Services
             var hash = Rfc2898DeriveBytes.Pbkdf2(input, salt, iterations, algorithm, keySize);
 
             var result = string.Join(
-                _segmentDelimiter,
+                segmentDelimiter,
                 Convert.ToHexString(hash),
                 Convert.ToHexString(salt),
                 iterations,
@@ -33,7 +33,7 @@ namespace SmartFlow.Services
 
         public static bool VerifyHash(this string input, string hashString)
         {
-            var segments = hashString.Split(_segmentDelimiter);
+            var segments = hashString.Split(segmentDelimiter);
             var hash = Convert.FromHexString(segments[0]);
             var salt = Convert.FromHexString(segments[1]);
             var iterations = int.Parse(segments[2]);
@@ -65,22 +65,17 @@ namespace SmartFlow.Services
 
         public static string GetAppTransactionsFilePath()
         {
-            return Path.Combine(GetAppDirectoryPath(), "Transaction.json");
-        }
-
-        public static string GetAppDebtsFilePath()
-        {
-            return Path.Combine(GetAppDirectoryPath(), "Debt.json");
+            return Path.Combine(GetAppDirectoryPath(), "transactions.json");
         }
 
         public static string GetAppTagsFilePath()
         {
-            return Path.Combine(GetAppDirectoryPath(), "Tag.json");
+            return Path.Combine(GetAppDirectoryPath(), "tags.json");
         }
 
-        public static string GetAppTransactionTagsFilePath()
+        public static string GetAppDebtsFilePath()
         {
-            return Path.Combine(GetAppDirectoryPath(), "Transaction-Tag.json");
+            return Path.Combine(GetAppDirectoryPath(), "debts.json");
         }
     }
-}
+    }

@@ -1,0 +1,98 @@
+@page "/debt"
+
+<head>
+    <link rel="stylesheet" href="css/Debt.css" />
+</head>
+<nav class="nav">
+    <a class="nav-link active" @onclick="NavigateToDashboard">Dashboard</a>
+    <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
+    <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
+    <div class="logout">
+        <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
+    </div>
+</nav>
+<h1><b>Debts</b></h1>
+
+<div class="mt-5">
+    <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>S.N</th>
+                    <th>Name</th>
+                    <th>Source</th>
+                    <th>Amount</th>
+                    <th>Start Date</th>
+                    <th>Due Date</th>
+                    <th>Cleared Date</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (debts.Any())
+                {
+                    @foreach (var debt in debts)
+                    {
+                        <tr>
+                            <td>@debt.Id</td>
+                            <td>@debt.Name</td>
+                            <td>@debt.Source</td>
+                            <td>@GlobalState.CurrentUser?.currency  @debt.Amount</td>
+                            <td>@debt.StartDate</td>
+                            <td>@debt.DueDate</td>
+                            <td>@debt.ClearedDate</td>
+                            <td>@debt.Category</td>
+                            <td>@debt.Status</td>
+                            <td>@debt.Type</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7">No Debts found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code 
+{
+    private bool IsLogout;
+
+    private void NavigateToTransaction()
+    {
+        Nav.NavigateTo("/Transaction");
+    }
+    private void NavigateToDashboard()
+    {
+        Nav.NavigateTo("/dashboard");
+    }
+    private void NavigateToDebt()
+    {
+        Nav.NavigateTo("/Debt");
+    }
+    private void NavigateToLogin()
+    {
+        Nav.NavigateTo("/login");
+    }
+
+    private List<Models.Debt> debts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        debts = DebtService.GetAllDebts();
+    }
+
+
+    private void ShowLogoutConfirmation()
+    {
+        IsLogout = true;
+    }
+
+    
+}

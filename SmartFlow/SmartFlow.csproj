@@ -38,9 +38,4 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Components\Shared\" />
-		<!-- Ensure users.json is copied to the output directory -->
-	</ItemGroup>
-
 </Project>

@@ -8,3 +8,14 @@
 @using SmartFlow
 @using SmartFlow.Components
 @using MudBlazor
+@using SmartFlow.Interface
+@using SmartFlow.Models
+@using SmartFlow.Services.Interface
+@inject NavigationManager Nav
+
+@inject IUserService UserService
+@inject ITransactionService TransactionService
+@* @inject ITagService TagService *@
+
+@inject IDebtService DebtService
+@inject GlobalState GlobalState

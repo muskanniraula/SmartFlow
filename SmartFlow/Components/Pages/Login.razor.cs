@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using SmartFlow.Models.Constant;
 using SmartFlow.Services;
 
 namespace SmartFlow.Components.Pages
@@ -14,7 +15,7 @@ namespace SmartFlow.Components.Pages
 
         private string Username { get; set; }
         private string Password { get; set; }
-        private string currency { get; set; }
+        //private string currency { get; set; }
 
         private string _errorMessage = "";
 
@@ -39,13 +40,37 @@ namespace SmartFlow.Components.Pages
                 var user = UserService.Login(Username, Password);  // Attempt to login
 
                 // If login is successful, navigate to the home page
-                Navigation.NavigateTo("/home");  // Redirect to home after successful login
+                // Redirect to home after successful login
+
+                if (user != null)
+                {
+                    GlobalState.CurrentUser = user;
+                    //GlobalState.CurrentUser.currency = currency;
+                    NavigateToDashboard();
+                }
+                else
+                {
+                    _errorMessage = "Invalid Username or Password";
+                }
             }
+
             catch (Exception e)
             {
                 _errorMessage = e.Message;  // Display error message if login fails
                 Console.WriteLine(e.Message);
             }
+        }
+        private void NavigateToRegister()
+        {
+            Navigation.NavigateTo("/register");  // Navigates to register page
+        }
+        private void NavigateToHome()
+        {
+            Navigation.NavigateTo("/home");  // Navigates to register page
+        }
+        private void NavigateToDashboard()
+        {
+            Navigation.NavigateTo("/dashboard");  // Navigates to register page
         }
 
     }

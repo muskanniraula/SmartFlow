@@ -1,39 +1,207 @@
-@* @inject JsonPersistenceService PersistenceService *@
+@page "/dashboard"
+@using SmartFlow.Services
 
-@* <MudCard Class="pa-4" Outlined="true"> *@
-@*     <MudCardContent> *@
-@*         <MudText Typo="Typo.h5" Align="Align.Center">Dashboard</MudText> *@
-@*         <MudTable Items="transactions" Class="mt-4" Bordered="true" Striped="true"> *@
-@*             <HeaderContent> *@
-@*                 <MudTh>Type</MudTh> *@
-@*                 <MudTh>Amount</MudTh> *@
-@*                 <MudTh>Date</MudTh> *@
-@*             </HeaderContent> *@
-@*             <RowTemplate> *@
-@*                 <MudTd>@context.Type</MudTd> *@
-@*                 <MudTd>@context.Amount.ToString("C")</MudTd> *@
-@*                 <MudTd>@context.Date.ToString("dd MMM yyyy")</MudTd> *@
-@*             </RowTemplate> *@
-@*             <NoRecordsContent> *@
-@*                 <MudText Typo="Typo.body1" Align="Align.Center">No transactions found.</MudText> *@
-@*             </NoRecordsContent> *@
-@*         </MudTable> *@
-@*     </MudCardContent> *@
-@* </MudCard> *@
+<h3>Dashboard</h3>
 
-@* @code { *@
-@*     private List<Transaction> transactions; *@
-@*     private string ErrorMessage; *@
+<div class="row">
+    <nav class="nav">
+        <a class="nav-link active" @onclick="NavigateToDashboard">Dashboard</a>
+        <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
+        <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
+        <div class="logout">
+            <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
+        </div>
+    </nav>
+    <h1>@GlobalState.CurrentUser.Username</h1>
 
-@*     protected override async Task OnInitializedAsync() *@
-@*     { *@
-@*         try *@
-@*         { *@
-@*             transactions = await PersistenceService.LoadData<Transaction>("transactions.json") ?? new List<Transaction>(); *@
-@*         } *@
-@*         catch (Exception ex) *@
-@*         { *@
-@*             ErrorMessage = $"Error loading transactions: {ex.Message}"; *@
-@*         } *@
-@*     } *@
-@* } *@
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-header">Total Balance</div>
+            <div class="card-body">
+                <h4 class="card-title">@TotalBalance.ToString("C")</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-header">Total Debts</div>
+            <div class="card-body">
+                <h4 class="card-title">@TotalDebts.ToString("C")</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-header">Remaining Debts</div>
+            <div class="card-body">
+                <h4 class="card-title">@RemainingDebts.ToString("C")</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                Transactions (@PendingDebtsCount Pending)
+                <div class="btn-group float-end">
+                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Filter
+                    </button>
+                    <ul class="dropdown-menu">
+                        @* <li><a class="dropdown-item" href="#" @onclick="() => SetFilter(\" All\")">All</a></li> *@
+                        @* <li><a class="dropdown-item" href="#" @onclick="() => SetFilter(\" Credit\")">Credit</a></li> *@
+                        @* <li><a class="dropdown-item" href="#" @onclick="() => SetFilter(\" Debit\")">Debit</a></li> *@
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    @* <tbody> *@
+                    @*     @foreach (var transaction in GetFilteredTransactions()) *@
+                    @*     { *@
+                    @*         <tr> *@
+                    @*             <td>@transaction.Date.ToString("dd/MM/yyyy")</td> *@
+                    @*             <td>@transaction.Title</td> *@
+                    @*             <td>@transaction.Amount.ToString("C")</td> *@
+                    @*             <td class="@GetTransactionTypeClass(transaction.Type)">@transaction.Type</td> *@
+                    @*         </tr> *@
+                    @*     } *@
+                    @* </tbody> *@
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header">Debts</div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Source</th>
+                            <th>Amount</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* @foreach (var debt in Debts) *@
+                        @* { *@
+                        @*     <tr> *@
+                        @*         <td>@debt.Source</td> *@
+                        @*         <td>@debt.Amount.ToString("C")</td> *@
+                        @*         <td>@debt.DueDate.ToString("dd/MM/yyyy")</td> *@
+                        @*         <td>@debt.Status</td> *@
+                        @*     </tr> *@
+                        @* } *@
+                    </tbody>
+                </table>
+                @* <button type="button" class="btn btn-sm btn-warning float-end" @onclick="MarkDebtsAsOverdue">Mark Overdue</button> *@
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (IsLogout)
+{
+    <div class="alert alert-warning" role="alert">
+        Are you sure you want to logout?
+    </div>
+}
+
+@code {
+
+
+        private void NavigateToTransaction()
+        {
+            Nav.NavigateTo("/Transaction");
+        }
+    private void NavigateToDashboard()
+    {
+        Nav.NavigateTo("/dashboard");
+    }
+        private void NavigateToDebt()
+        {
+            Nav.NavigateTo("/Debt");
+        }
+        private void NavigateToLogin()
+        {
+            Nav.NavigateTo("/login");
+        }
+    private List<Transaction> transactions { get; set; } = new List<Transaction>();
+    private List<Debt> Debts { get; set; } = new List<Debt>();
+    public decimal TotalBalance { get; set; }
+    public decimal TotalDebts { get; set; }
+    public decimal RemainingDebts { get; set; }
+    public int PendingDebtsCount { get; set; }
+    private string FilterType { get; set; } = "All";
+    private bool IsLogout { get; set; }
+
+    protected override async void OnInitialized()
+    {
+        //transactions = await TransactionService.GetAllTransactions();
+      
+
+    // TotalBalance = TransactionService.CalculateBalance(Transactions);
+    //     TotalDebts = DebtService.GetTotalDebts(Debts);
+    //     RemainingDebts = DebtService.GetRemainingDebts(Debts);
+    //     PendingDebtsCount = DebtService.GetPendingDebtsCount(Debts);
+ 
+    }
+
+    // private async Task<List<Models.Transaction>> GetTransactionsAsync()
+    // {
+    //     try{
+    //         transactions =  await TransactionService.GetAllTransactions();
+    //         return transactions;
+    //     }
+    //     catch(Exception e)
+    //     {
+    //         throw new Exception(); 
+    //     }
+    // }
+    private void ShowLogoutConfirmation()
+    {
+        IsLogout = true;
+    }
+
+    private void SetFilter(string filterType)
+    {
+        FilterType = filterType;
+    }
+
+    // private IEnumerable<Transaction> GetFilteredTransactions()
+    // {
+    //     return FilterType switch
+    //     {
+    //         "Credit" => Transactions.Where(t => t.Type == "Credit"),
+    //         "Debit" => Transactions.Where(t => t.Type == "Debit"),
+    //         _ => Transactions
+    //     };
+    // }
+
+    private string GetTransactionTypeClass(string type)
+    {
+        return type switch
+        {
+            "Credit" => "text-success",
+            "Debit" => "text-danger",
+            _ => string.Empty
+        };
+    }
+
+    // private void MarkDebtsAsOverdue()
+    // {
+    //     DebtService.MarkOverdueDebts(Debts);
+    // }
+}

@@ -1,0 +1,246 @@
+@page "/transaction"
+
+<h3>Transactions</h3>
+<nav class="nav">
+    <a class="nav-link active" @onclick="NavigateToDashboard">Dashboard</a>
+    <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
+    <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
+    <div class="logout">
+        <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
+    </div>
+</nav>
+<button class="btn btn-primary" @onclick="OpenAddTransactionModal">Add Transaction</button>
+
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transaction in transactions)
+        {
+            <tr>
+                <td>@transaction.Name</td>
+                <td>@transaction.Amount</td>
+                <td>@transaction.Type</td>
+                <td>@transaction.Date</td>
+                <td>@transaction.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (showModal)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="z-index: 1050;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Transaction</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Title</label>
+                        <input type="text" class="form-control" @bind="newtransaction.Name" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Date</label>
+                        <input type="date" class="form-control" @bind="newtransaction.Date" />
+                    </div>
+                    <div class="mb-3">
+                        <label>Amount (@GlobalState.CurrentUser?.currency)</label>
+                        <input type="number" class="form-control" @bind="newtransaction.Amount" />
+                    </div>
+                    <div class="mb-3">
+                        <label>Type</label>
+                        <select class="form-control" @bind="newtransaction.Type">
+                            <option value=""></option>
+                            <option value="Income">Income</option>
+                            <option value="Expense">Expense</option>
+                            <option value="Debt">Debt</option>
+                        </select>
+                    </div>
+
+                    @if (newtransaction.Type == "Debt")
+                    {
+                        <div class="mb-3">
+                            <label>Due Date</label>
+                            <input type="date" class="form-control" @bind="newdebt.DueDate"/>
+                        </div>
+                        <div class="mb-3">
+                            <label>Source</label>
+                            <select class="form-control" @bind="newdebt.Source">
+                                <option value=""></option>
+                                <option value="Kumari Bank">Kumari Bank LTD.</option>
+                                <option value="Nic Asia Bank">Nic Asia Bank LTB.</option>
+                                <option value="Everest Bank">Everest Bank LTD.</option>
+                            </select>
+                        </div>
+                    }
+                    <div class="mb-3">
+                        <label>Notes</label>
+                        <input type="text" class="form-control" @bind="newtransaction.Notes" />
+                    </div>
+                    @if (!string.IsNullOrEmpty(ErrorMessage))
+                    {
+                        <div class="alert alert-danger">@ErrorMessage</div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+                    <button type="button" class="btn btn-primary" @onclick="AddTransaction">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<TransactionModal Visible="@isModalVisible" OnAddTransaction="AddTransaction" />
+
+@code {
+    private bool IsLogout;
+    private void NavigateToTransaction()
+    {
+        Nav.NavigateTo("/Transaction");
+    }
+    private void NavigateToDashboard()
+    {
+        Nav.NavigateTo("/dashboard");
+    }
+    private void NavigateToDebt()
+    {
+        Nav.NavigateTo("/Debt");
+    }
+    private void NavigateToLogin()
+    {
+        Nav.NavigateTo("/login");
+    }
+
+    private void ShowLogoutConfirmation()
+    {
+        IsLogout = true;
+    }
+
+    private string ErrorMessage;
+    private decimal totalIncome;
+    private decimal totalExpense;
+    private decimal totalDebt;
+    private decimal totalBalance;
+    private Boolean showModal;
+    private Models.Transaction newtransaction = new();
+    private Models.Debt newdebt = new();
+
+    private List<Models.Transaction> transactions;
+    private bool isModalVisible = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        transactions = TransactionService.GetAllTransactions();
+        CalculateTotals();
+    }
+
+    private void OpenAddTransactionModal()
+    {
+        isModalVisible = true;
+    }
+
+    private async Task AddTransaction(Transaction newTransaction)
+    {
+        var success = await TransactionService.AddTransaction(newtransaction);
+        if (success)
+        {   
+            isModalVisible = false; // Close modal
+        }
+        else
+        {
+            // Handle failure
+        }
+    }
+    private void OpenModal()
+    {
+        newtransaction = new Models.Transaction { Date = DateTime.Now };
+        
+        ErrorMessage = null;
+        showModal = true;
+
+    }
+
+    private void CloseModal() => showModal = false;
+
+    private async Task AddTransaction()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(newtransaction.Type) || string.IsNullOrEmpty(newtransaction.Name) || (newtransaction.Amount <= 0))
+            {
+                ErrorMessage = "Empty Field. Please select a type.";
+                return;
+            }
+
+            if (newtransaction.Type == "Expense")
+            {
+                if (totalBalance < newtransaction.Amount)
+                {
+                    ErrorMessage = "Insufficient amount.";
+                    return;
+                }
+            }
+
+            if (newtransaction.Type == "Debt")
+            {
+                if (string.IsNullOrEmpty(newdebt.Source))
+                {
+                    ErrorMessage = "Please select a debt source.";
+                    return;
+                }
+
+                newdebt.Name = newtransaction.Name;
+                newdebt.Amount = newtransaction.Amount;
+                newdebt.Source = newdebt.Source;
+                newdebt.Status = "Pending";
+
+                var debtResult = await DebtService.AddDebtAsync(newdebt);
+
+
+                if (!debtResult)
+                {
+                    ErrorMessage = "Failed to add the debt.";
+                    return;
+                }
+            }
+
+            var transactionResult = await TransactionService.AddTransaction(newtransaction);
+
+            if (transactionResult)
+            {
+                newtransaction = new Models.Transaction();
+                newdebt = new Models.Debt();
+                CloseModal();
+            }
+            else
+            {
+                ErrorMessage = "Failed to add the transaction. Please check the details.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An unexpected error occurred.";
+        }
+    }
+    private void CalculateTotals()
+    {
+        totalIncome = transactions.Where(t => t.Type == "Income").Sum(t => t.Amount);
+        totalExpense = transactions.Where(t => t.Type == "Expense").Sum(t => t.Amount);
+        totalDebt = transactions.Where(t => t.Type == "Debt").Sum(t => t.Amount);
+        totalBalance = totalIncome + totalDebt - totalExpense;
+    }
+
+}
