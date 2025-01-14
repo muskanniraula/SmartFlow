@@ -9,16 +9,20 @@
         <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
     </div>
 </nav>
-<button class="btn btn-primary" @onclick="OpenAddTransactionModal">Add Transaction</button>
+<button class="btn btn-primary" @onclick="OpenModal">Add Transaction</button>
 
 <table class="table mt-3">
     <thead>
         <tr>
+           
             <th>Name</th>
             <th>Amount</th>
-            <th>Type</th>
             <th>Date</th>
+            <th>Type</th>
+            <th>Category</th>
             <th>Status</th>
+            <th>Tags</th>
+            <th>Notes</th>
         </tr>
     </thead>
     <tbody>
@@ -27,9 +31,12 @@
             <tr>
                 <td>@transaction.Name</td>
                 <td>@transaction.Amount</td>
+                <td>@transaction.Date.ToShortDateString()</td>
                 <td>@transaction.Type</td>
-                <td>@transaction.Date</td>
+                <td>@transaction.Category</td>
                 <td>@transaction.Status</td>
+                <td>@transaction.Tags</td>
+                <td>@transaction.Notes</td>
             </tr>
         }
     </tbody>
@@ -37,7 +44,7 @@
 
 @if (showModal)
 {
-    <div class="modal fade show" tabindex="-1" role="dialog" style="z-index: 1050;">
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;" aria-modal="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -46,52 +53,44 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label>Title</label>
+                        <label>Name</label>
                         <input type="text" class="form-control" @bind="newtransaction.Name" />
                     </div>
-
+                    <div class="mb-3">
+                        <label>Amount</label>
+                        <input type="number" class="form-control" @bind="newtransaction.Amount" />
+                    </div>
                     <div class="mb-3">
                         <label>Date</label>
                         <input type="date" class="form-control" @bind="newtransaction.Date" />
                     </div>
                     <div class="mb-3">
-                        <label>Amount (@GlobalState.CurrentUser?.currency)</label>
-                        <input type="number" class="form-control" @bind="newtransaction.Amount" />
-                    </div>
-                    <div class="mb-3">
                         <label>Type</label>
                         <select class="form-control" @bind="newtransaction.Type">
-                            <option value=""></option>
-                            <option value="Income">Income</option>
-                            <option value="Expense">Expense</option>
-                            <option value="Debt">Debt</option>
+                            <option value="Credit">Credit</option>
+                            <option value="Debit">Debit</option>
                         </select>
                     </div>
-
-                    @if (newtransaction.Type == "Debt")
-                    {
-                        <div class="mb-3">
-                            <label>Due Date</label>
-                            <input type="date" class="form-control" @bind="newdebt.DueDate"/>
-                        </div>
-                        <div class="mb-3">
-                            <label>Source</label>
-                            <select class="form-control" @bind="newdebt.Source">
-                                <option value=""></option>
-                                <option value="Kumari Bank">Kumari Bank LTD.</option>
-                                <option value="Nic Asia Bank">Nic Asia Bank LTB.</option>
-                                <option value="Everest Bank">Everest Bank LTD.</option>
-                            </select>
-                        </div>
-                    }
+                    <div class="mb-3">
+                        <label>Category</label>
+                        <input type="text" class="form-control" @bind="newtransaction.Category" />
+                    </div>
+                    <div class="mb-3">
+                        <label>Status</label>
+                        <select class="form-control" @bind="newtransaction.Status">
+                            <option value="Completed">Completed</option>
+                            <option value="Failed">Failed</option>
+                            <option value="Pending">Pending</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Tags</label>
+                        <input type="text" class="form-control" @bind="newtransaction.Tags" />
+                    </div>
                     <div class="mb-3">
                         <label>Notes</label>
-                        <input type="text" class="form-control" @bind="newtransaction.Notes" />
+                        <textarea class="form-control" @bind="newtransaction.Notes"></textarea>
                     </div>
-                    @if (!string.IsNullOrEmpty(ErrorMessage))
-                    {
-                        <div class="alert alert-danger">@ErrorMessage</div>
-                    }
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
@@ -100,6 +99,7 @@
             </div>
         </div>
     </div>
+    <div class="modal-backdrop fade show"></div>
 }
 
 
