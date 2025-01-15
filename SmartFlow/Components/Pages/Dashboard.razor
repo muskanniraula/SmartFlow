@@ -5,9 +5,29 @@
     <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
     <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
     <div class="logout">
-        @* <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button> *@
+        <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
     </div>
 </nav>
+
+<!-- The Logout Confirmation Modal -->
+@if (IsLogout)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;" aria-modal="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Are you sure you want to logout?</h5>
+                    <button type="button" class="btn-close" @onclick="CloseLogoutConfirmation"></button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseLogoutConfirmation">No</button>
+                    <button type="button" class="btn btn-primary" @onclick="Logout">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
 
 <h3>Dashboard</h3>
 
@@ -134,6 +154,7 @@
     private decimal totalDebt;
     private decimal clearedDebt;
     private decimal remainingDebt;
+    private bool IsLogout;
     private List<Models.Transaction> transactions = new List<Models.Transaction>();
     private List<Debt> debts = new List<Debt>(); // Store debts separately
     private List<Models.Transaction> filteredTransactions = new List<Models.Transaction>();
@@ -193,6 +214,18 @@
 
         StateHasChanged(); // Refresh UI
     }
+    private void ShowLogoutConfirmation()
+    {
+        IsLogout = true;
+    }
+    private void CloseLogoutConfirmation()
+    {
+        IsLogout = false;
+    }
+    private void Logout()
+    {
+        NavigateToLogin(); // Navigate to login page
+    }
 
     private void NavigateToTransaction()
     {
@@ -208,7 +241,10 @@
     {
         Nav.NavigateTo("/Debt");
     }
-
+    private void NavigateToLogin()
+    {
+        Nav.NavigateTo("/");
+    }
     // private void ShowLogoutConfirmation()
     // {
     //     IsLogout = true;

@@ -11,6 +11,27 @@
         <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
     </div>
 </nav>
+
+<!-- The Logout Confirmation Modal -->
+@if (IsLogout)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;" aria-modal="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Are you sure you want to logout?</h5>
+                    <button type="button" class="btn-close" @onclick="CloseLogoutConfirmation"></button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseLogoutConfirmation">No</button>
+                    <button type="button" class="btn btn-primary" @onclick="Logout">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
 <h1><b>Debts</b></h1>
 <button class="btn btn-primary mt-3" @onclick="OpenModal">Add Debt</button>
 <div class="row mt-4">
@@ -217,7 +238,7 @@
 
     private void NavigateToLogin()
     {
-        Nav.NavigateTo("/login");
+        Nav.NavigateTo("/");
     }
 
     private List<Models.Debt> debts = new();
@@ -239,6 +260,14 @@
     private void ShowLogoutConfirmation()
     {
         IsLogout = true;
+    }
+    private void CloseLogoutConfirmation()
+    {
+        IsLogout = false;
+    }
+    private void Logout()
+    {
+        NavigateToLogin(); // Navigate to login page
     }
 
     private void OpenModal()

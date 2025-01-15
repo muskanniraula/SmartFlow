@@ -8,6 +8,26 @@
     </div>
 </nav>
 
+<!-- The Logout Confirmation Modal -->
+@if (IsLogout)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;" aria-modal="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Are you sure you want to logout?</h5>
+                    <button type="button" class="btn-close" @onclick="CloseLogoutConfirmation"></button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseLogoutConfirmation">No</button>
+                    <button type="button" class="btn btn-primary" @onclick="Logout">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
 <h3>Transactions</h3>
 
 <button class="btn btn-primary" @onclick="OpenModal">Add Transaction</button>
@@ -230,11 +250,7 @@
 
 
 
-    private void ShowLogoutConfirmation()
-    {
-        IsLogout = true;
-    }
-
+    
     protected override async Task OnInitializedAsync()
     {
         transactions = TransactionService.GetAllTransactions();  // Use async method here
@@ -377,6 +393,8 @@
     }
 
 
+
+
     // private  void async AddTransaction()
     // {
     //     try
@@ -438,6 +456,18 @@
 
 
 
+    private void ShowLogoutConfirmation()
+    {
+        IsLogout = true;
+    }
+    private void CloseLogoutConfirmation()
+    {
+        IsLogout = false;
+    }
+    private void Logout()
+    {
+        NavigateToLogin(); // Navigate to login page
+    }
 
     private void NavigateToTransaction()
     {
@@ -453,7 +483,7 @@
     }
     private void NavigateToLogin()
     {
-        Nav.NavigateTo("/login");
+        Nav.NavigateTo("/");
     }
 
 }
