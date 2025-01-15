@@ -1,207 +1,239 @@
 @page "/dashboard"
-@using SmartFlow.Services
+
+<nav class="nav">
+    <a class="nav-link active" @onclick="NavigateToDashboard">Dashboard</a>
+    <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
+    <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
+    <div class="logout">
+        @* <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button> *@
+    </div>
+</nav>
 
 <h3>Dashboard</h3>
 
 <div class="row">
-    <nav class="nav">
-        <a class="nav-link active" @onclick="NavigateToDashboard">Dashboard</a>
-        <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
-        <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
-        <div class="logout">
-            <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
+    <!-- Total Balance Card -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Balance</h5>
+                <p class="card-text">@GlobalState.CurrentUser?.currency @totalBalance</p>
+            </div>
         </div>
-    </nav>
-    <h1>@GlobalState.CurrentUser.Username</h1>
+    </div>
 
+    <!-- Total Inflows Card -->
     <div class="col-md-4">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-header">Total Balance</div>
+        <div class="card">
             <div class="card-body">
-                <h4 class="card-title">@TotalBalance.ToString("C")</h4>
+                <h5 class="card-title">Total Inflows</h5>
+                <p class="card-text">@GlobalState.CurrentUser?.currency @totalInflows</p>
             </div>
         </div>
     </div>
+
+    <!-- Total Outflows Card -->
     <div class="col-md-4">
-        <div class="card text-white bg-danger mb-3">
-            <div class="card-header">Total Debts</div>
+        <div class="card">
             <div class="card-body">
-                <h4 class="card-title">@TotalDebts.ToString("C")</h4>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-white bg-warning mb-3">
-            <div class="card-header">Remaining Debts</div>
-            <div class="card-body">
-                <h4 class="card-title">@RemainingDebts.ToString("C")</h4>
+                <h5 class="card-title">Total Outflows</h5>
+                <p class="card-text">@GlobalState.CurrentUser?.currency @totalOutflows</p>
             </div>
         </div>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-6">
-        <div class="card mb-3">
-            <div class="card-header">
-                Transactions (@PendingDebtsCount Pending)
-                <div class="btn-group float-end">
-                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        Filter
-                    </button>
-                    <ul class="dropdown-menu">
-                        @* <li><a class="dropdown-item" href="#" @onclick="() => SetFilter(\" All\")">All</a></li> *@
-                        @* <li><a class="dropdown-item" href="#" @onclick="() => SetFilter(\" Credit\")">Credit</a></li> *@
-                        @* <li><a class="dropdown-item" href="#" @onclick="() => SetFilter(\" Debit\")">Debit</a></li> *@
-                    </ul>
-                </div>
-            </div>
+    <!-- Total Debt Card -->
+    <div class="col-md-4">
+        <div class="card">
             <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Title</th>
-                            <th>Amount</th>
-                            <th>Type</th>
-                        </tr>
-                    </thead>
-                    @* <tbody> *@
-                    @*     @foreach (var transaction in GetFilteredTransactions()) *@
-                    @*     { *@
-                    @*         <tr> *@
-                    @*             <td>@transaction.Date.ToString("dd/MM/yyyy")</td> *@
-                    @*             <td>@transaction.Title</td> *@
-                    @*             <td>@transaction.Amount.ToString("C")</td> *@
-                    @*             <td class="@GetTransactionTypeClass(transaction.Type)">@transaction.Type</td> *@
-                    @*         </tr> *@
-                    @*     } *@
-                    @* </tbody> *@
-                </table>
+                <h5 class="card-title">Total Debt</h5>
+                <p class="card-text">@GlobalState.CurrentUser?.currency @totalDebt</p>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card mb-3">
-            <div class="card-header">Debts</div>
+
+    <!-- Cleared Debt Card -->
+    <div class="col-md-4">
+        <div class="card">
             <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Source</th>
-                            <th>Amount</th>
-                            <th>Due Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @* @foreach (var debt in Debts) *@
-                        @* { *@
-                        @*     <tr> *@
-                        @*         <td>@debt.Source</td> *@
-                        @*         <td>@debt.Amount.ToString("C")</td> *@
-                        @*         <td>@debt.DueDate.ToString("dd/MM/yyyy")</td> *@
-                        @*         <td>@debt.Status</td> *@
-                        @*     </tr> *@
-                        @* } *@
-                    </tbody>
-                </table>
-                @* <button type="button" class="btn btn-sm btn-warning float-end" @onclick="MarkDebtsAsOverdue">Mark Overdue</button> *@
+                <h5 class="card-title">Cleared Debt</h5>
+                <p class="card-text">@GlobalState.CurrentUser?.currency @clearedDebt</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remaining Debt Card -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Remaining Debt</h5>
+                <p class="card-text">@GlobalState.CurrentUser?.currency @remainingDebt</p>
             </div>
         </div>
     </div>
 </div>
-
-@if (IsLogout)
-{
-    <div class="alert alert-warning" role="alert">
-        Are you sure you want to logout?
+<!-- Sorting Controls -->
+<div class="d-flex justify-content-between my-3">
+    <div>
+        <label for="sortField">Sort By:</label>
+        <select id="sortField" @bind="selectedSortField" class="form-control-sm">
+            <option value="Name">Name</option>
+            <option value="Amount">Amount</option>
+            <option value="Date">Date</option>
+            <option value="Type">Type</option>
+            <option value="Category">Category</option>
+            <option value="Status">Status</option>
+            <option value="Tags">Tags</option>
+            <option value="Notes">Notes</option>
+        </select>
     </div>
-}
+
+    <div>
+        <label for="sortOrder">Order:</label>
+        <select id="sortOrder" @bind="selectedSortOrder" class="form-control-sm">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+    </div>
+
+    <button @onclick="SortTransactions" class="btn btn-primary btn-sm align-self-end">
+        Apply Sort
+    </button>
+</div>
+
+<!-- Transaction Table -->
+<h4>Transactions</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Tags</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transaction in transactions)
+        {
+            <tr>
+                <td>@transaction.Name</td>
+                <td>@GlobalState.CurrentUser?.currency @transaction.Amount</td>
+                <td>@transaction.Date.ToShortDateString()</td>
+                <td>@transaction.Type</td>
+                <td>@transaction.Category</td>
+                <td>@transaction.Status</td>
+                <td>@transaction.Tags</td>
+                <td>@transaction.Notes</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
+    private decimal totalBalance;
+    private decimal totalInflows;
+    private decimal totalOutflows;
+    private decimal totalDebt;
+    private decimal clearedDebt;
+    private decimal remainingDebt;
+    private List<Models.Transaction> transactions = new List<Models.Transaction>();
 
+    // Sorting fields and order
+    private string selectedSortField = "Name";
+    private string selectedSortOrder = "asc";
 
-        private void NavigateToTransaction()
+    protected override async Task OnInitializedAsync()
+    {
+        transactions = TransactionService.GetAllTransactions();
+        CalculateTotals();
+    }
+
+    private void CalculateTotals()
+    {
+        totalInflows = transactions.Where(t => t.Type == "Credit").Sum(t => t.Amount);
+        totalOutflows = transactions.Where(t => t.Type == "Debit").Sum(t => t.Amount);
+        totalDebt = transactions.Where(t => t.Type == "Debt").Sum(t => t.Amount);
+        clearedDebt = transactions.Where(t => t.Type == "Debt" && t.Status == "Cleared").Sum(t => t.Amount);
+        remainingDebt = totalDebt - clearedDebt;
+        totalBalance = totalInflows - totalOutflows + remainingDebt;
+    }
+    private void SortTransactions()
+    {
+        // Sorting logic based on selected field and order
+        if (selectedSortField == "Name")
         {
-            Nav.NavigateTo("/Transaction");
+            transactions = selectedSortOrder == "asc" ?
+                transactions.OrderBy(t => t.Name).ToList() :
+                transactions.OrderByDescending(t => t.Name).ToList();
         }
+        else if (selectedSortField == "Amount")
+        {
+            transactions = selectedSortOrder == "asc" ?
+                transactions.OrderBy(t => t.Amount).ToList() :
+                transactions.OrderByDescending(t => t.Amount).ToList();
+        }
+        else if (selectedSortField == "Date")
+        {
+            transactions = selectedSortOrder == "asc" ?
+                transactions.OrderBy(t => t.Date).ToList() :
+                transactions.OrderByDescending(t => t.Date).ToList();
+        }
+        else if (selectedSortField == "Type")
+        {
+            transactions = selectedSortOrder == "asc" ?
+                transactions.OrderBy(t => t.Type).ToList() :
+                transactions.OrderByDescending(t => t.Type).ToList();
+        }
+        else if (selectedSortField == "Category")
+        {
+            transactions = selectedSortOrder == "asc" ?
+                transactions.OrderBy(t => t.Category).ToList() :
+                transactions.OrderByDescending(t => t.Category).ToList();
+        }
+        else if (selectedSortField == "Status")
+        {
+            transactions = selectedSortOrder == "asc" ?
+                transactions.OrderBy(t => t.Status).ToList() :
+                transactions.OrderByDescending(t => t.Status).ToList();
+        }
+        else if (selectedSortField == "Tags")
+        {
+            transactions = selectedSortOrder == "asc" ?
+                transactions.OrderBy(t => t.Tags).ToList() :
+                transactions.OrderByDescending(t => t.Tags).ToList();
+        }
+        else if (selectedSortField == "Notes")
+        {
+            transactions = selectedSortOrder == "asc" ?
+                transactions.OrderBy(t => t.Notes).ToList() :
+                transactions.OrderByDescending(t => t.Notes).ToList();
+        }
+
+        StateHasChanged(); // Re-render the page to reflect sorted transactions
+    }
+    private void NavigateToTransaction()
+    {
+        Nav.NavigateTo("/Transaction");
+    }
+
     private void NavigateToDashboard()
     {
         Nav.NavigateTo("/dashboard");
     }
-        private void NavigateToDebt()
-        {
-            Nav.NavigateTo("/Debt");
-        }
-        private void NavigateToLogin()
-        {
-            Nav.NavigateTo("/login");
-        }
-    private List<Transaction> transactions { get; set; } = new List<Transaction>();
-    private List<Debt> Debts { get; set; } = new List<Debt>();
-    public decimal TotalBalance { get; set; }
-    public decimal TotalDebts { get; set; }
-    public decimal RemainingDebts { get; set; }
-    public int PendingDebtsCount { get; set; }
-    private string FilterType { get; set; } = "All";
-    private bool IsLogout { get; set; }
 
-    protected override async void OnInitialized()
+    private void NavigateToDebt()
     {
-        //transactions = await TransactionService.GetAllTransactions();
-      
-
-    // TotalBalance = TransactionService.CalculateBalance(Transactions);
-    //     TotalDebts = DebtService.GetTotalDebts(Debts);
-    //     RemainingDebts = DebtService.GetRemainingDebts(Debts);
-    //     PendingDebtsCount = DebtService.GetPendingDebtsCount(Debts);
- 
+        Nav.NavigateTo("/Debt");
     }
 
-    // private async Task<List<Models.Transaction>> GetTransactionsAsync()
+    // private void ShowLogoutConfirmation()
     // {
-    //     try{
-    //         transactions =  await TransactionService.GetAllTransactions();
-    //         return transactions;
-    //     }
-    //     catch(Exception e)
-    //     {
-    //         throw new Exception(); 
-    //     }
-    // }
-    private void ShowLogoutConfirmation()
-    {
-        IsLogout = true;
-    }
-
-    private void SetFilter(string filterType)
-    {
-        FilterType = filterType;
-    }
-
-    // private IEnumerable<Transaction> GetFilteredTransactions()
-    // {
-    //     return FilterType switch
-    //     {
-    //         "Credit" => Transactions.Where(t => t.Type == "Credit"),
-    //         "Debit" => Transactions.Where(t => t.Type == "Debit"),
-    //         _ => Transactions
-    //     };
-    // }
-
-    private string GetTransactionTypeClass(string type)
-    {
-        return type switch
-        {
-            "Credit" => "text-success",
-            "Debit" => "text-danger",
-            _ => string.Empty
-        };
-    }
-
-    // private void MarkDebtsAsOverdue()
-    // {
-    //     DebtService.MarkOverdueDebts(Debts);
+    //     IsLogout = true;
     // }
 }

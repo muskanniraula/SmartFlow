@@ -31,6 +31,7 @@ namespace SmartFlow.Services
 
                 var newTransaction = new Transaction
                 {
+                   
                     Name = transaction.Name,
                     Amount = transaction.Amount,
                     Date = transaction.Date == default ? DateTime.Now : transaction.Date,

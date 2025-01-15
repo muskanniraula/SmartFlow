@@ -102,7 +102,6 @@
 <table class="table mt-3">
     <thead>
         <tr>
-           
             <th>Name</th>
             <th>Amount</th>
             <th>Date</th>
@@ -155,6 +154,7 @@
                     <div class="mb-3">
                         <label>Type</label>
                         <select class="form-control" @bind="newtransaction.Type">
+                            <option value=""></option>
                             <option value="Credit">Credit</option>
                             <option value="Debit">Debit</option>
                         </select>
@@ -189,7 +189,6 @@
     </div>
     <div class="modal-backdrop fade show"></div>
 }
-
 
 <TransactionModal Visible="@isModalVisible" OnAddTransaction="AddTransaction" />
 
@@ -242,18 +241,19 @@
         isModalVisible = true;
     }
 
-    private async Task AddTransaction(Transaction newTransaction)
+    private async Task AddTransaction()
     {
         var success = await TransactionService.AddTransaction(newtransaction);
         if (success)
-        {   
-            isModalVisible = false; // Close modal
+        {
+            CloseModal();
         }
         else
         {
             // Handle failure
         }
     }
+
 
     // Filter transactions based on selected criteria
     private void FilterTransactions()
@@ -319,7 +319,7 @@
     private void OpenModal()
     {
         newtransaction = new Models.Transaction { Date = DateTime.Now };
-        
+
         ErrorMessage = null;
         showModal = true;
 
@@ -327,66 +327,53 @@
 
     private void CloseModal() => showModal = false;
 
-    private async Task AddTransaction()
-    {
-        try
-        {
-            if (string.IsNullOrEmpty(newtransaction.Type) || string.IsNullOrEmpty(newtransaction.Name) || (newtransaction.Amount <= 0))
-            {
-                ErrorMessage = "Empty Field. Please select a type.";
-                return;
-            }
+    // private  void async AddTransaction()
+    // {
+    //     try
+    //     {
+    //         if (string.IsNullOrEmpty(newtransaction.Type) || string.IsNullOrEmpty(newtransaction.Name) || (newtransaction.Amount <= 0))
+    //         {
+    //             ErrorMessage = "Empty Field. Please select a type.";
+    //             return;
+    //         }
 
-            if (newtransaction.Type == "Expense")
-            {
-                if (totalBalance < newtransaction.Amount)
-                {
-                    ErrorMessage = "Insufficient amount.";
-                    return;
-                }
-            }
+    //         if (newtransaction.Type == "Expense")
+    //         {
+    //             if (totalBalance < newtransaction.Amount)
+    //             {
+    //                 ErrorMessage = "Insufficient amount.";
+    //                 return;
+    //             }
+    //         }
 
-            if (newtransaction.Type == "Debt")
-            {
-                if (string.IsNullOrEmpty(newdebt.Source))
-                {
-                    ErrorMessage = "Please select a debt source.";
-                    return;
-                }
+    //         if (newtransaction.Type == "Debt")
+    //         {
+    //             if (string.IsNullOrEmpty(newdebt.Source))
+    //             {
+    //                 ErrorMessage = "Please select a debt source.";
+    //                 return;
+    //             }
 
-                newdebt.Name = newtransaction.Name;
-                newdebt.Amount = newtransaction.Amount;
-                newdebt.Source = newdebt.Source;
-                newdebt.Status = "Pending";
+               
+    //         }
+    //         var transactionResult = await TransactionService.AddTransaction(newtransaction);
 
-                var debtResult = await DebtService.AddDebtAsync(newdebt);
-
-
-                if (!debtResult)
-                {
-                    ErrorMessage = "Failed to add the debt.";
-                    return;
-                }
-            }
-
-            var transactionResult = await TransactionService.AddTransaction(newtransaction);
-
-            if (transactionResult)
-            {
-                newtransaction = new Models.Transaction();
-                newdebt = new Models.Debt();
-                CloseModal();
-            }
-            else
-            {
-                ErrorMessage = "Failed to add the transaction. Please check the details.";
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = "An unexpected error occurred.";
-        }
-    }
+    //         if (transactionResult)
+    //         {
+    //             newtransaction = new Models.Transaction();
+    //             newdebt = new Models.Debt();
+    //             CloseModal();
+    //         }
+    //         else
+    //         {
+    //             ErrorMessage = "Failed to add the transaction. Please check the details.";
+    //         }
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         ErrorMessage = "An unexpected error occurred.";
+    //     }
+    // }
     private void CalculateTotals()
     {
         TotalInflow = transactions.Where(t => t.Type == "Credit").Sum(t => t.Amount);

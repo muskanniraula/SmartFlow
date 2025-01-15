@@ -11,12 +11,11 @@ namespace SmartFlow.Services
     public class DebtService : GenericService<Debt>, IDebtService
     {
         private List<Debt> debts;
-        private readonly string AppDebtsFilePath;
+        private readonly string AppDebtsFilePath=UtilityService.GetAppDebtsFilePath();
 
         public DebtService()
         {
-            // Retrieve the file path for debts
-            AppDebtsFilePath = UtilityService.GetAppDebtsFilePath();
+
 
             // Load existing debts or initialize with an empty list
             debts = GetAll(AppDebtsFilePath) ?? new List<Debt>();
