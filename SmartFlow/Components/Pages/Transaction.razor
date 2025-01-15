@@ -237,7 +237,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        transactions = TransactionService.GetAllTransactions();
+        transactions = TransactionService.GetAllTransactions();  // Use async method here
         FilteredTransactions = transactions;
         CalculateTotals();
         UpdateDashboardMetrics();
@@ -249,54 +249,54 @@
     }
 
     private async Task AddTransaction()
+{
+    try
     {
-        try
+        // Validate inputs
+        if (string.IsNullOrEmpty(newtransaction.Type) ||
+            string.IsNullOrEmpty(newtransaction.Name) ||
+            newtransaction.Amount <= 0)
         {
-            // Validate inputs
-            if (string.IsNullOrEmpty(newtransaction.Type) ||
-                string.IsNullOrEmpty(newtransaction.Name) ||
-                newtransaction.Amount <= 0)
-            {
-                ErrorMessage = "Please fill in all required fields correctly.";
-                StateHasChanged(); // Update UI
-                return;
-            }
-
-            // Check for sufficient balance if it's a debit transaction
-            if (newtransaction.Type == "Debit" && newtransaction.Amount > TotalBalance)
-            {
-                ErrorMessage = "Insufficient balance for this transaction.";
-                StateHasChanged(); // Update UI
-                return;
-            }
-
-            // Attempt to add the transaction via the service
-            var success = await TransactionService.AddTransaction(newtransaction);
-
-            if (success)
-            {
-                // Refresh the transaction list and recalculate totals
-                transactions = TransactionService.GetAllTransactions();
-                FilteredTransactions = transactions;
-                CalculateTotals();
-                UpdateDashboardMetrics();
-
-                // Close the modal and reset fields
-                CloseModal();
-                newtransaction = new Models.Transaction { Date = DateTime.Now };
-            }
-            else
-            {
-                ErrorMessage = "Failed to add the transaction. Please try again.";
-                StateHasChanged(); // Update UI
-            }
+            ErrorMessage = "Please fill in all required fields correctly.";
+            StateHasChanged(); // Update UI
+            return;
         }
-        catch (Exception ex)
+
+        // Check for sufficient balance if it's a debit transaction
+        if (newtransaction.Type == "Debit" && newtransaction.Amount > TotalBalance)
         {
-            ErrorMessage = "An unexpected error occurred: " + ex.Message;
+            ErrorMessage = "Insufficient balance for this transaction.";
+            StateHasChanged(); // Update UI
+            return;
+        }
+
+        // Attempt to add the transaction via the service
+        var success = await TransactionService.AddTransaction(newtransaction);
+
+        if (success)
+        {
+            // Refresh the transaction list and recalculate totals
+            transactions = TransactionService.GetAllTransactions();
+            FilteredTransactions = transactions;
+            CalculateTotals();
+            UpdateDashboardMetrics();
+
+            // Close the modal and reset fields
+            CloseModal();
+            newtransaction = new Models.Transaction { Date = DateTime.Now };
+        }
+        else
+        {
+            ErrorMessage = "Failed to add the transaction. Please try again.";
             StateHasChanged(); // Update UI
         }
     }
+    catch (Exception ex)
+    {
+        ErrorMessage = "An unexpected error occurred: " + ex.Message;
+        StateHasChanged(); // Update UI
+    }
+}
 
 
 

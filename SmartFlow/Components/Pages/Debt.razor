@@ -13,12 +13,48 @@
 </nav>
 <h1><b>Debts</b></h1>
 <button class="btn btn-primary mt-3" @onclick="OpenModal">Add Debt</button>
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Balance</h5>
+                <p class="card-text">@GlobalState.CurrentUser?.currency @TotalBalance</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Total Debt</h5>
+                <p class="card-text">@GlobalState.CurrentUser?.currency @TotalDebt</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Remaining Debt</h5>
+                <p class="card-text">@GlobalState.CurrentUser?.currency @RemainingDebt</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Cleared Debt</h5>
+                <p class="card-text">@GlobalState.CurrentUser?.currency @ClearedDebt</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="mt-5">
     <div>
         <table class="table">
             <thead>
                 <tr>
-                    
+
                     <th>Name</th>
                     <th>Source</th>
                     <th>Amount</th>
@@ -37,13 +73,13 @@
                     @foreach (var debt in debts)
                     {
                         <tr>
-                           
+
                             <td>@debt.Name</td>
                             <td>@debt.Source</td>
-                            <td>@GlobalState.CurrentUser?.currency  @debt.Amount</td>
+                            <td>@GlobalState.CurrentUser?.currency @debt.Amount</td>
                             <td>@debt.StartDate.ToShortDateString()</td>
                             <td>@debt.DueDate.ToShortDateString()</td>
-                            <td>@debt.ClearedDate</td>
+                            <td>@debt.ClearedDate?.ToShortDateString()</td> <!-- Display cleared date -->
                             <td>@debt.Category</td>
                             <td>@debt.Status</td>
                             <td>@debt.Type</td>
@@ -148,22 +184,34 @@
     </div>
     <div class="modal-backdrop fade show"></div>
 }
-@code 
+@code
 {
+    private decimal TotalDebt => debts.Sum(d => d.Amount);
+    private decimal ClearedDebt => debts.Where(d => d.Status == "Cleared").Sum(d => d.Amount);
+    private decimal RemainingDebt => TotalDebt - ClearedDebt;
+
+    // Shared calculation for total balance from transactions (same as in the Transaction page)
+    private decimal TotalBalance => transactions
+        .Where(t => t.Type == "Credit") // Consider only credit (inflows)
+        .Sum(t => t.Amount);
+
     private bool IsLogout;
 
     private void NavigateToTransaction()
     {
         Nav.NavigateTo("/Transaction");
     }
+
     private void NavigateToDashboard()
     {
         Nav.NavigateTo("/dashboard");
     }
+
     private void NavigateToDebt()
     {
         Nav.NavigateTo("/Debt");
     }
+
     private void NavigateToLogin()
     {
         Nav.NavigateTo("/login");
@@ -174,15 +222,16 @@
     private bool showModal = false;
     private bool showEditModal = false;
     private Models.Debt editingDebt = new();
+    private List<Models.Transaction> transactions = new();
 
     private List<Models.Debt> debt;
 
-
+    // On initialization, fetch debts and transactions
     protected override async Task OnInitializedAsync()
     {
         debts = DebtService.GetAllDebts();
+        transactions = TransactionService.GetAllTransactions(); // Fetch transactions here
     }
-
 
     private void ShowLogoutConfirmation()
     {
@@ -210,30 +259,39 @@
     {
         if (ValidateDebt(newDebt))
         {
-            var success =  DebtService.AddDebtAsync(newDebt);
+            DebtService.AddDebtAsync(newDebt);
+            debts = DebtService.GetAllDebts(); // Refresh the debts list
+            transactions = TransactionService.GetAllTransactions(); // Refresh transactions
             CloseModal();
         }
     }
+
     private void EditClearedDate(Models.Debt debt)
     {
         editingDebt = debt;
         showEditModal = true;
     }
+
     private void CloseEditModal()
     {
         showEditModal = false;
     }
+
     private void SaveClearedDate()
     {
-        editingDebt.ClearedDate = editingDebt.ClearedDate;
-        CloseEditModal();
+        if (editingDebt != null)
+        {
+            editingDebt.ClearedDate = editingDebt.ClearedDate;
+            editingDebt.Status = "Cleared"; // Set status to Cleared
+            debts = DebtService.GetAllDebts();
+            CloseEditModal();
+        }
     }
+
     private bool ValidateDebt(Models.Debt debt)
     {
         return !string.IsNullOrWhiteSpace(debt.Name) &&
                !string.IsNullOrWhiteSpace(debt.Source) &&
                debt.Amount > 0;
     }
-
-    
 }
