@@ -26,5 +26,7 @@ namespace SmartFlow.Services.Interface
         /// <param name="debtId">The ID of the debt to clear</param>
         /// <returns>True if the debt was cleared successfully, otherwise false</returns>
         Task<bool> ClearDebtAsync(int id);
+        Task<bool> UpdateDebt(Debt updatedDebt);
+
     }
 }

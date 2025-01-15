@@ -45,13 +45,13 @@ namespace SmartFlow.Services
                     DueDate = debt.DueDate,
                     ClearedDate = debt.ClearedDate,
                     Category = debt.Category,
-                    Status = debt.Status
+                    Status = debt.Status,
+                    Type = debt.Type // Ensure Type is being assigned here
                 };
 
                 debts.Add(newDebt);
-
-                // Save debts to the file
                 SaveAll(debts, AppDebtsFilePath);
+
                 return true;
             }
             catch (Exception ex)
@@ -72,10 +72,14 @@ namespace SmartFlow.Services
                 existingDebt.Amount = updatedDebt.Amount;
                 existingDebt.StartDate = updatedDebt.StartDate;
                 existingDebt.DueDate = updatedDebt.DueDate;
-                existingDebt.ClearedDate = updatedDebt.ClearedDate;
-                existingDebt.Status = updatedDebt.Status;
                 existingDebt.Category = updatedDebt.Category;
                 existingDebt.Source = updatedDebt.Source;
+
+                // Update ClearedDate and Status
+                existingDebt.ClearedDate = updatedDebt.ClearedDate;
+
+                // If ClearedDate is null, set status to Pending
+                existingDebt.Status = updatedDebt.ClearedDate == null ? "Pending" : "Cleared";
 
                 // Save the updated list of debts
                 SaveAll(debts, AppDebtsFilePath);
@@ -112,5 +116,6 @@ namespace SmartFlow.Services
                 return false;
             }
         }
+
     }
 }

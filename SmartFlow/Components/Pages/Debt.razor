@@ -103,86 +103,86 @@
 </div>
 @if (showModal)
 {
-    <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;" aria-modal="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Debt</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Name</label>
-                        <input type="text" class="form-control" @bind="newDebt.Name" />
+<div class="modal fade show" tabindex="-1" role="dialog" style="display: block;" aria-modal="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Debt</h5>
+                        <button type="button" class="btn-close" @onclick="CloseModal"></button>
                     </div>
-                    <div class="mb-3">
-                        <label>Source</label>
-                        <input type="text" class="form-control" @bind="newDebt.Source" />
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label>Name</label>
+                            <input type="text" class="form-control" @bind="newDebt.Name" />
+                        </div>
+                        <div class="mb-3">
+                            <label>Source</label>
+                            <input type="text" class="form-control" @bind="newDebt.Source" />
+                        </div>
+                        <div class="mb-3">
+                            <label>Amount</label>
+                            <input type="number" class="form-control" @bind="newDebt.Amount" />
+                        </div>
+                        <div class="mb-3">
+                            <label>Start Date</label>
+                            <input type="date" class="form-control" @bind="newDebt.StartDate" />
+                        </div>
+                        <div class="mb-3">
+                            <label>Due Date</label>
+                            <input type="date" class="form-control" @bind="newDebt.DueDate" />
+                        </div>
+                        <div class="mb-3">
+                            <label>Category</label>
+                            <input type="text" class="form-control" @bind="newDebt.Category" />
+                        </div>
+                        <div class="mb-3">
+                            <label>Status</label>
+                            <select class="form-control" @bind="newDebt.Status">
+                                <option value="Pending">Pending</option>
+                                <option value="Cleared">Cleared</option>
+                                <option value="Failed">Failed</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Type</label>
+                            <select class="form-control" @bind="newDebt.Type">
+                                <option value="Debt">Debt</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label>Amount</label>
-                        <input type="number" class="form-control" @bind="newDebt.Amount" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+                        <button type="button" class="btn btn-primary" @onclick="AddDebt">Add</button>
                     </div>
-                    <div class="mb-3">
-                        <label>Start Date</label>
-                        <input type="date" class="form-control" @bind="newDebt.StartDate" />
-                    </div>
-                    <div class="mb-3">
-                        <label>Due Date</label>
-                        <input type="date" class="form-control" @bind="newDebt.DueDate" />
-                    </div>
-                    <div class="mb-3">
-                        <label>Category</label>
-                        <input type="text" class="form-control" @bind="newDebt.Category" />
-                    </div>
-                    <div class="mb-3">
-                        <label>Status</label>
-                        <select class="form-control" @bind="newDebt.Status">
-                            <option value="Pending">Pending</option>
-                            <option value="Cleared">Cleared</option>
-                            <option value="Failed">Failed</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label>Type</label>
-                        <select class="form-control" @bind="newDebt.Type">
-                            <option value="Loan">Loan</option>
-                            <option value="Credit">Credit</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
-                    <button type="button" class="btn btn-primary" @onclick="AddDebt">Add</button>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="modal-backdrop fade show"></div>
+        <div class="modal-backdrop fade show"></div>
 }
+
 @if (showEditModal)
 {
-    <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;" aria-modal="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Cleared Date</h5>
-                    <button type="button" class="btn-close" @onclick="CloseEditModal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Cleared Date</label>
-                        <input type="date" class="form-control" @bind="editingDebt.ClearedDate" />
+        <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;" aria-modal="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Cleared Date</h5>
+                        <button type="button" class="btn-close" @onclick="CloseEditModal"></button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseEditModal">Cancel</button>
-                    <button type="button" class="btn btn-primary" @onclick="SaveClearedDate">Save</button>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label>Cleared Date</label>
+                            <input type="date" class="form-control" @bind="editingDebt.ClearedDate" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseEditModal">Cancel</button>
+                        <button type="button" class="btn btn-primary" @onclick="SaveClearedDate">Save</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="modal-backdrop fade show"></div>
+        <div class="modal-backdrop fade show"></div>
 }
 @code
 {
@@ -248,7 +248,7 @@
                 StartDate = DateTime.Now,
                 DueDate = DateTime.Now.AddDays(30),
                 Status = "Pending",
-                Type = "Loan"
+                Type = "Debt"
             };
         showModal = true;
     }
@@ -258,16 +258,17 @@
         showModal = false;
     }
 
-    private void AddDebt()
+    private async Task AddDebt()
     {
         if (ValidateDebt(newDebt))
         {
-            DebtService.AddDebtAsync(newDebt);
+            await DebtService.AddDebtAsync(newDebt); // Add debt asynchronously
             debts = DebtService.GetAllDebts(); // Refresh the debts list
-            transactions = TransactionService.GetAllTransactions(); // Refresh transactions
+            StateHasChanged(); // Ensure the UI updates after adding the debt
             CloseModal();
         }
     }
+
 
     private void EditClearedDate(Models.Debt debt)
     {
@@ -284,9 +285,11 @@
     {
         if (editingDebt != null)
         {
-            editingDebt.ClearedDate = editingDebt.ClearedDate;
-            editingDebt.Status = "Cleared"; // Set status to Cleared
-            debts = DebtService.GetAllDebts();
+            // Set ClearedDate and Status
+            editingDebt.Status = editingDebt.ClearedDate == null ? "Pending" : "Cleared";
+
+            DebtService.UpdateDebt(editingDebt); // Update the debt in the service
+            debts = DebtService.GetAllDebts(); // Refresh the debts list
             CloseEditModal();
         }
     }

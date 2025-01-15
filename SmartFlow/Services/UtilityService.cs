@@ -53,7 +53,7 @@ namespace SmartFlow.Services
         /// <returns>Path of the directory that holds all the application data</returns>
         public static string GetAppDirectoryPath()
         {
-            return @"D:\Islington\5th Semester\Application Development\Coursework\SmartFlow\SmartFlow";
+            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SmartFlow");
         }
 
         public static string GetAppUsersFilePath()
