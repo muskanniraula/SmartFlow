@@ -139,6 +139,12 @@
                     <button type="button" class="btn-close" @onclick="CloseModal"></button>
                 </div>
                 <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(ErrorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            @ErrorMessage
+                        </div>
+                    }
                     <div class="mb-3">
                         <label>Name</label>
                         <input type="text" class="form-control" @bind="newtransaction.Name" />
@@ -189,6 +195,7 @@
     </div>
     <div class="modal-backdrop fade show"></div>
 }
+
 
 <TransactionModal Visible="@isModalVisible" OnAddTransaction="AddTransaction" />
 
@@ -243,16 +250,54 @@
 
     private async Task AddTransaction()
     {
-        var success = await TransactionService.AddTransaction(newtransaction);
-        if (success)
+        try
         {
-            CloseModal();
+            // Validate inputs
+            if (string.IsNullOrEmpty(newtransaction.Type) ||
+                string.IsNullOrEmpty(newtransaction.Name) ||
+                newtransaction.Amount <= 0)
+            {
+                ErrorMessage = "Please fill in all required fields correctly.";
+                StateHasChanged(); // Update UI
+                return;
+            }
+
+            // Check for sufficient balance if it's a debit transaction
+            if (newtransaction.Type == "Debit" && newtransaction.Amount > TotalBalance)
+            {
+                ErrorMessage = "Insufficient balance for this transaction.";
+                StateHasChanged(); // Update UI
+                return;
+            }
+
+            // Attempt to add the transaction via the service
+            var success = await TransactionService.AddTransaction(newtransaction);
+
+            if (success)
+            {
+                // Refresh the transaction list and recalculate totals
+                transactions = TransactionService.GetAllTransactions();
+                FilteredTransactions = transactions;
+                CalculateTotals();
+                UpdateDashboardMetrics();
+
+                // Close the modal and reset fields
+                CloseModal();
+                newtransaction = new Models.Transaction { Date = DateTime.Now };
+            }
+            else
+            {
+                ErrorMessage = "Failed to add the transaction. Please try again.";
+                StateHasChanged(); // Update UI
+            }
         }
-        else
+        catch (Exception ex)
         {
-            // Handle failure
+            ErrorMessage = "An unexpected error occurred: " + ex.Message;
+            StateHasChanged(); // Update UI
         }
     }
+
 
 
     // Filter transactions based on selected criteria
@@ -325,7 +370,12 @@
 
     }
 
-    private void CloseModal() => showModal = false;
+    private void CloseModal()
+    {
+        showModal = false;
+        ErrorMessage = null;
+    }
+
 
     // private  void async AddTransaction()
     // {
