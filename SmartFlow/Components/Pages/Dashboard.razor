@@ -92,6 +92,7 @@
 
     <button @onclick="FilterTopTransactions" class="btn btn-primary btn-sm">Apply Filter</button>
 </div>
+
 <!-- Filtered Transactions Table -->
 <h5>Top 5 @selectedFilterType Transactions (@selectedFilterOrder)</h5>
 <table class="table table-striped">
@@ -108,6 +109,7 @@
         </tr>
     </thead>
     <tbody>
+
         @foreach (var transaction in filteredTransactions)
         {
             <tr>
@@ -133,6 +135,7 @@
     private decimal clearedDebt;
     private decimal remainingDebt;
     private List<Models.Transaction> transactions = new List<Models.Transaction>();
+    private List<Debt> debts = new List<Debt>(); // Store debts separately
     private List<Models.Transaction> filteredTransactions = new List<Models.Transaction>();
     // Filter options
     private string selectedFilterType = "Inflow";
@@ -141,19 +144,32 @@
     protected override async Task OnInitializedAsync()
     {
         transactions = TransactionService.GetAllTransactions();
+        await CalculateDebtTotals(); // Call DebtService to calculate debt totals
         CalculateTotals();
         FilterTopTransactions();
     }
 
     private void CalculateTotals()
     {
+        /// Calculate total inflows and total outflows from transactions
         totalInflows = transactions.Where(t => t.Type == "Credit").Sum(t => t.Amount);
         totalOutflows = transactions.Where(t => t.Type == "Debit").Sum(t => t.Amount);
-        totalDebt = transactions.Where(t => t.Type == "Debt").Sum(t => t.Amount);
-        clearedDebt = transactions.Where(t => t.Type == "Debt" && t.Status == "Cleared").Sum(t => t.Amount);
-        remainingDebt = totalDebt - clearedDebt;
-        totalBalance = totalInflows - totalOutflows + remainingDebt;
+
+        // Calculate the total balance as the difference between total inflows and total outflows
+        totalBalance = totalInflows - totalOutflows;
     }
+
+    private async Task CalculateDebtTotals()
+    {
+        // Get all debts from the DebtService
+        var debts = DebtService.GetAllDebts();
+
+        // Calculate total debt, cleared debt, and remaining debt
+        totalDebt = debts.Sum(d => d.Amount);
+        clearedDebt = debts.Where(d => d.Status == "Cleared").Sum(d => d.Amount);
+        remainingDebt = totalDebt - clearedDebt;
+    }
+
     private void FilterTopTransactions()
     {
         // Filter transactions by type
@@ -161,7 +177,7 @@
         {
             "Inflow" => transactions.Where(t => t.Type == "Credit"),
             "Outflow" => transactions.Where(t => t.Type == "Debit"),
-            "Debt" => transactions.Where(t => t.Type == "Debt"),
+            // "Debt" => debts.Where(d => d.Type == "Debt"),
             _ => transactions
         };
 

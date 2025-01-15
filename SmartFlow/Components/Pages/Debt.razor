@@ -192,8 +192,11 @@
 
     // Shared calculation for total balance from transactions (same as in the Transaction page)
     private decimal TotalBalance => transactions
-        .Where(t => t.Type == "Credit") // Consider only credit (inflows)
-        .Sum(t => t.Amount);
+    .Where(t => t.Type == "Credit") // Consider only inflows (credits)
+    .Sum(t => t.Amount) -
+    transactions
+    .Where(t => t.Type == "Debit") // Consider only outflows (debits)
+    .Sum(t => t.Amount);
 
     private bool IsLogout;
 
