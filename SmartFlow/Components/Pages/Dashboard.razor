@@ -74,37 +74,26 @@
         </div>
     </div>
 </div>
-<!-- Sorting Controls -->
-<div class="d-flex justify-content-between my-3">
-    <div>
-        <label for="sortField">Sort By:</label>
-        <select id="sortField" @bind="selectedSortField" class="form-control-sm">
-            <option value="Name">Name</option>
-            <option value="Amount">Amount</option>
-            <option value="Date">Date</option>
-            <option value="Type">Type</option>
-            <option value="Category">Category</option>
-            <option value="Status">Status</option>
-            <option value="Tags">Tags</option>
-            <option value="Notes">Notes</option>
-        </select>
-    </div>
+<!-- Filter Section -->
+<h4>Filter Top 5 Transactions/Debts</h4>
+<div class="d-flex align-items-center my-3">
+    <label for="filterType" class="mr-2">Filter By:</label>
+    <select id="filterType" @bind="selectedFilterType" class="form-control-sm mr-3">
+        <option value="Inflow">Inflow</option>
+        <option value="Outflow">Outflow</option>
+        <option value="Debt">Debt</option>
+    </select>
 
-    <div>
-        <label for="sortOrder">Order:</label>
-        <select id="sortOrder" @bind="selectedSortOrder" class="form-control-sm">
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-        </select>
-    </div>
+    <label for="filterOrder" class="mr-2">Order:</label>
+    <select id="filterOrder" @bind="selectedFilterOrder" class="form-control-sm mr-3">
+        <option value="Highest">Highest</option>
+        <option value="Lowest">Lowest</option>
+    </select>
 
-    <button @onclick="SortTransactions" class="btn btn-primary btn-sm align-self-end">
-        Apply Sort
-    </button>
+    <button @onclick="FilterTopTransactions" class="btn btn-primary btn-sm">Apply Filter</button>
 </div>
-
-<!-- Transaction Table -->
-<h4>Transactions</h4>
+<!-- Filtered Transactions Table -->
+<h5>Top 5 @selectedFilterType Transactions (@selectedFilterOrder)</h5>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -119,7 +108,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var transaction in transactions)
+        @foreach (var transaction in filteredTransactions)
         {
             <tr>
                 <td>@transaction.Name</td>
@@ -135,6 +124,7 @@
     </tbody>
 </table>
 
+
 @code {
     private decimal totalBalance;
     private decimal totalInflows;
@@ -143,15 +133,16 @@
     private decimal clearedDebt;
     private decimal remainingDebt;
     private List<Models.Transaction> transactions = new List<Models.Transaction>();
-
-    // Sorting fields and order
-    private string selectedSortField = "Name";
-    private string selectedSortOrder = "asc";
+    private List<Models.Transaction> filteredTransactions = new List<Models.Transaction>();
+    // Filter options
+    private string selectedFilterType = "Inflow";
+    private string selectedFilterOrder = "Highest";
 
     protected override async Task OnInitializedAsync()
     {
         transactions = TransactionService.GetAllTransactions();
         CalculateTotals();
+        FilterTopTransactions();
     }
 
     private void CalculateTotals()
@@ -163,60 +154,30 @@
         remainingDebt = totalDebt - clearedDebt;
         totalBalance = totalInflows - totalOutflows + remainingDebt;
     }
-    private void SortTransactions()
+    private void FilterTopTransactions()
     {
-        // Sorting logic based on selected field and order
-        if (selectedSortField == "Name")
+        // Filter transactions by type
+        var filtered = selectedFilterType switch
         {
-            transactions = selectedSortOrder == "asc" ?
-                transactions.OrderBy(t => t.Name).ToList() :
-                transactions.OrderByDescending(t => t.Name).ToList();
+            "Inflow" => transactions.Where(t => t.Type == "Credit"),
+            "Outflow" => transactions.Where(t => t.Type == "Debit"),
+            "Debt" => transactions.Where(t => t.Type == "Debt"),
+            _ => transactions
+        };
+
+        // Sort and take top 5 by order
+        if (selectedFilterOrder == "Highest")
+        {
+            filteredTransactions = filtered.OrderByDescending(t => t.Amount).Take(5).ToList();
         }
-        else if (selectedSortField == "Amount")
+        else
         {
-            transactions = selectedSortOrder == "asc" ?
-                transactions.OrderBy(t => t.Amount).ToList() :
-                transactions.OrderByDescending(t => t.Amount).ToList();
-        }
-        else if (selectedSortField == "Date")
-        {
-            transactions = selectedSortOrder == "asc" ?
-                transactions.OrderBy(t => t.Date).ToList() :
-                transactions.OrderByDescending(t => t.Date).ToList();
-        }
-        else if (selectedSortField == "Type")
-        {
-            transactions = selectedSortOrder == "asc" ?
-                transactions.OrderBy(t => t.Type).ToList() :
-                transactions.OrderByDescending(t => t.Type).ToList();
-        }
-        else if (selectedSortField == "Category")
-        {
-            transactions = selectedSortOrder == "asc" ?
-                transactions.OrderBy(t => t.Category).ToList() :
-                transactions.OrderByDescending(t => t.Category).ToList();
-        }
-        else if (selectedSortField == "Status")
-        {
-            transactions = selectedSortOrder == "asc" ?
-                transactions.OrderBy(t => t.Status).ToList() :
-                transactions.OrderByDescending(t => t.Status).ToList();
-        }
-        else if (selectedSortField == "Tags")
-        {
-            transactions = selectedSortOrder == "asc" ?
-                transactions.OrderBy(t => t.Tags).ToList() :
-                transactions.OrderByDescending(t => t.Tags).ToList();
-        }
-        else if (selectedSortField == "Notes")
-        {
-            transactions = selectedSortOrder == "asc" ?
-                transactions.OrderBy(t => t.Notes).ToList() :
-                transactions.OrderByDescending(t => t.Notes).ToList();
+            filteredTransactions = filtered.OrderBy(t => t.Amount).Take(5).ToList();
         }
 
-        StateHasChanged(); // Re-render the page to reflect sorted transactions
+        StateHasChanged(); // Refresh UI
     }
+
     private void NavigateToTransaction()
     {
         Nav.NavigateTo("/Transaction");
