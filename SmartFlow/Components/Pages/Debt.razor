@@ -128,8 +128,9 @@
                             <td>@debt.Status</td>
                             <td>@debt.Type</td>
                             <td>
-                                <button class="btn btn-sm btn-outline-primary" @onclick="() => EditClearedDate(debt)">
-                                    <i class="bi bi-pencil-square"></i>
+                                <button class="btn btn-sm btn-outline-primary" @onclick="() => EditClearedDate(debt)"
+                                        disabled="@(debt.Amount > TotalBalance)">
+                                    Clear Debt
                                 </button>
                             </td>
                         </tr>
@@ -145,7 +146,26 @@
         </table>
     </div>
 </div>
-
+@if (showErrorPopup)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;" aria-modal="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Insufficient Balance</h5>
+                    <button type="button" class="btn-close" @onclick="CloseErrorPopup"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Your current balance is insufficient to clear this debt.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseErrorPopup">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
 @if (showModal)
 {
 <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;" aria-modal="true">
@@ -257,7 +277,7 @@
     .ToList();
 
 
-
+ 
 
     private bool IsLogout;
 
@@ -361,10 +381,14 @@
             CloseModal(); // Close the modal after adding
         }
     }
+    private bool showErrorPopup = false;
 
 
 
-
+    private void CloseErrorPopup()
+    {
+        showErrorPopup = false;
+    }
 
     private void EditClearedDate(Models.Debt debt)
     {

@@ -11,26 +11,15 @@ namespace SmartFlow.Components.Pages
 {
     public partial class Login
     {
-        [CascadingParameter]
-
-        private string Username { get; set; }
+        [CascadingParameter] private string Username { get; set; }
         private string Password { get; set; }
-        //private string currency { get; set; }
 
         private string _errorMessage = "";
 
+        // OnInitialized is not needed for the login, it is only useful for setup logic
         protected override void OnInitialized()
         {
-
-            try
-            {
-                UserService.Login(Username, Password);
-            }
-            catch (Exception e)
-            {
-                _errorMessage = e.Message;
-                Console.WriteLine(e.Message);
-            }
+            // Initialization logic (if needed) can be placed here
         }
 
         private void LoginHandler()
@@ -39,39 +28,32 @@ namespace SmartFlow.Components.Pages
             {
                 var user = UserService.Login(Username, Password);  // Attempt to login
 
-                // If login is successful, navigate to the home page
-                // Redirect to home after successful login
-
+                // If login is successful, navigate to the dashboard
                 if (user != null)
                 {
                     GlobalState.CurrentUser = user;
-                    //GlobalState.CurrentUser.currency = currency;
                     NavigateToDashboard();
                 }
                 else
                 {
-                    _errorMessage = "Invalid Username or Password";
+                    _errorMessage = "Invalid Username or Password";  // Set the error message if login fails
                 }
             }
-
             catch (Exception e)
             {
-                _errorMessage = e.Message;  // Display error message if login fails
+                _errorMessage = "An error occurred: " + e.Message;  // Display error message if login fails
                 Console.WriteLine(e.Message);
             }
         }
+
         private void NavigateToRegister()
         {
             Navigation.NavigateTo("/register");  // Navigates to register page
         }
-        private void NavigateToHome()
-        {
-            Navigation.NavigateTo("/home");  // Navigates to register page
-        }
+
         private void NavigateToDashboard()
         {
-            Navigation.NavigateTo("/dashboard");  // Navigates to register page
+            Navigation.NavigateTo("/dashboard");  // Navigates to dashboard
         }
-
     }
 }

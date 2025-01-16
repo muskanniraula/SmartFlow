@@ -17,12 +17,12 @@
 
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" class="form-control" @bind="Password" placeholder="*******"/>
+                    <input type="password" id="password" class="form-control" @bind="Password" placeholder="*******" />
                 </div>
 
                 @if (!string.IsNullOrEmpty(_errorMessage))
                 {
-                    <ErrorMessage Type="danger" Message="@_errorMessage" />
+                    <div class="alert alert-danger">@_errorMessage</div>
                 }
 
                 <div class="mt-4 d-grid">
@@ -45,8 +45,3 @@
         </div>
     </div>
 </div>
-
-
-@code {
-    
-}
