@@ -1,8 +1,12 @@
 @page "/transaction"
-<nav class="nav">
+<link href="css/Transaction.css" rel="stylesheet" />
+
+<nav class="navbar">
+    <div class="nav">
     <a class="nav-link active" @onclick="NavigateToDashboard">Dashboard</a>
     <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
     <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
+    </div>
     <div class="logout">
         <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
     </div>
@@ -28,11 +32,11 @@
     <div class="modal-backdrop fade show"></div>
 }
 
-<h3>Transactions</h3>
-
-<button class="btn btn-primary" @onclick="OpenModal">Add Transaction</button>
-<div class="row mb-3">
-    <!-- Total Transactions Card -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Transactions</h3>
+    <button class="btn btn-primary" @onclick="OpenModal">Add Transaction</button>
+</div>
+<div class="row mb-4">
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
@@ -41,8 +45,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Total Balance Card -->
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
@@ -51,8 +53,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Inflow Transactions Card -->
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
@@ -61,8 +61,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Outflow Transactions Card -->
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
@@ -71,11 +69,15 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+</div>
+
+<!-- Filter controls in one line -->
+<div class="row align-items-end mb-3">
+    <div class="col">
         <label>Search by Name</label>
         <input type="text" class="form-control" @bind="SearchQuery" placeholder="Search by Name" />
     </div>
-    <div class="col-md-3">
+    <div class="col">
         <label>Transaction Type</label>
         <select class="form-control" @bind="FilterType">
             <option value="All">All</option>
@@ -83,38 +85,38 @@
             <option value="Debit">Debit</option>
         </select>
     </div>
-
-    <div class="col-md-3">
+    <div class="col">
         <label>Category</label>
         <input type="text" class="form-control" @bind="FilterCategory" />
     </div>
-
-    <div class="col-md-3">
+    <div class="col">
         <label>Tags</label>
         <input type="text" class="form-control" @bind="FilterTags" />
     </div>
-
-    <div class="col-md-3">
+    <div class="col">
         <label>From Date</label>
         <input type="date" class="form-control" @bind="FilterFromDate" />
     </div>
-</div>
-
-<div class="row mb-3">
-    <div class="col-md-3">
+    <div class="col">
         <label>To Date</label>
         <input type="date" class="form-control" @bind="FilterToDate" />
     </div>
-    <div class="col-md-3">
-        <button class="btn btn-primary mt-4" @onclick="FilterTransactions">Apply Filters</button>
-    </div>
 </div>
 
-<!-- Sorting Button -->
-<button class="btn btn-outline-secondary mb-3" @onclick="ToggleSortOrder">
-    Sort By Date (@(IsDescending ? "Descending" : "Ascending"))
-</button>
-
+<!-- Filter and sort buttons -->
+<div class="d-flex justify-content-end mb-3">
+    <div class="me-2">
+        <button class="btn btn-primary" @onclick="FilterTransactions">Apply Filters</button>
+    </div>
+    <div class="me-2">
+        <button class="btn btn-outline-secondary" @onclick="ClearFilters">Clear Filters</button>
+    </div>
+    <div>
+        <button class="btn btn-outline-secondary" @onclick="ToggleSortOrder">
+            Sort By Date (@(IsDescending ? "Descending" : "Ascending"))
+        </button>
+    </div>
+</div>
 
 
 
@@ -362,7 +364,18 @@
         // Apply sorting
         SortTransactions();
     }
+    private void ClearFilters()
+    {
+        FilterType = "All";
+        FilterCategory = "";
+        FilterTags = "";
+        FilterFromDate = null;
+        FilterToDate = null;
+        SearchQuery = "";
 
+        // Refresh the filtered transactions
+        FilterTransactions();
+    }
     private void SortTransactions()
     {
         FilteredTransactions = IsDescending

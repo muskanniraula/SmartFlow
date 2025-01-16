@@ -70,12 +70,34 @@
 </div>
 
 
+<!-- Search and Date Range Filter -->
+<div class="row mt-4">
+    <div class="col-md-4">
+        <input type="text" class="form-control" placeholder="Search by name or source" @bind="searchTerm" />
+    </div>
+    <div class="col-md-3">
+        <h6>From</h6>
+        <input type="date" class="form-control" @bind="startDate"/>
+    </div>
+    <h6>To</h6>
+    <div class="col-md-3">
+        <input type="date" class="form-control" @bind="endDate"/>
+    </div>
+
+    <div class="col-md-2">
+        <button class="btn btn-primary w-100" @onclick="ApplyFilters">Apply Filters</button>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-secondary w-100" @onclick="ClearFilters">Clear Filters</button>
+    </div>
+</div>
+
+<!-- Debts Table -->
 <div class="mt-5">
     <div>
         <table class="table">
             <thead>
                 <tr>
-
                     <th>Name</th>
                     <th>Source</th>
                     <th>Amount</th>
@@ -89,18 +111,17 @@
                 </tr>
             </thead>
             <tbody>
-                @if (debts.Any())
+                @if (filteredDebts.Any())
                 {
-                    @foreach (var debt in debts)
+                    @foreach (var debt in filteredDebts)
                     {
                         <tr>
-
                             <td>@debt.Name</td>
                             <td>@debt.Source</td>
                             <td>@GlobalState.CurrentUser?.currency @debt.Amount</td>
                             <td>@debt.StartDate.ToShortDateString()</td>
                             <td>@debt.DueDate.ToShortDateString()</td>
-                            <td>@debt.ClearedDate?.ToShortDateString()</td> <!-- Display cleared date -->
+                            <td>@debt.ClearedDate?.ToShortDateString()</td>
                             <td>@debt.Category</td>
                             <td>@debt.Status</td>
                             <td>@debt.Type</td>
@@ -122,6 +143,7 @@
         </table>
     </div>
 </div>
+
 @if (showModal)
 {
 <div class="modal fade show" tabindex="-1" role="dialog" style="display: block;" aria-modal="true">
@@ -207,6 +229,9 @@
 }
 @code
 {
+    private string searchTerm = "";
+    private DateTime? startDate = null;
+    private DateTime? endDate = null;
     private decimal TotalDebt => debts.Sum(d => d.Amount);
     private decimal ClearedDebt => debts.Where(d => d.Status == "Cleared").Sum(d => d.Amount);
     private decimal RemainingDebt => TotalDebt - ClearedDebt;
@@ -218,6 +243,19 @@
     transactions
     .Where(t => t.Type == "Debit") // Consider only outflows (debits)
     .Sum(t => t.Amount);
+
+    private List<Models.Debt> filteredDebts => debts
+    .Where(d => (string.IsNullOrEmpty(searchTerm) ||
+                 d.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                 d.Source.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) &&
+                (!startDate.HasValue || d.StartDate >= startDate.Value) && // StartDate filter
+                (!endDate.HasValue || d.StartDate <= endDate.Value) &&    // EndDate filter
+                (!startDate.HasValue || d.DueDate >= startDate.Value) &&  // DueDate filter
+                (!endDate.HasValue || d.DueDate <= endDate.Value))        // DueDate filter
+    .ToList();
+
+
+
 
     private bool IsLogout;
 
@@ -256,6 +294,27 @@
         debts = DebtService.GetAllDebts();
         transactions = TransactionService.GetAllTransactions(); // Fetch transactions here
 
+    }
+    private async Task ApplyFilters()
+    {
+        // Validate date range
+        if (startDate.HasValue && endDate.HasValue && startDate > endDate)
+        {
+            // Optionally, show an error if startDate is later than endDate
+            return;
+        }
+
+        StateHasChanged(); // Refresh the UI to reflect the filtered list
+    }
+    private void ClearFilters()
+    {
+        // Clear all the filters
+        searchTerm = string.Empty;
+        startDate = null;
+        endDate = null;
+
+        // Refresh the UI to reflect the cleared filters
+        StateHasChanged();
     }
 
     private void ShowLogoutConfirmation()

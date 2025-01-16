@@ -103,8 +103,31 @@
             <MudChart ChartType="ChartType.Pie" Width="200px" Height="200px" InputData="@data" InputLabels="@labels" />
             </div>
         </div>
- </div>
 
+ </div>
+<!-- Debt Overview Pie Chart Section -->
+@* <div class="row"> *@
+@* <div class="col-md-6"> *@
+@*     <div class="dashboard-card"> *@
+@*         <h5>Debt Overview</h5> *@
+@*         <MudChart ChartType="ChartType.Pie" Width="200px" Height="200px" InputData="@data" InputLabels="@labels" @onhover="OnChartHover" /> *@
+@*         <div class="chart-legend"> *@
+@*             <div class="legend-item"> *@
+@*                 <span class="circle" style="background-color: @clearedDebtColor;"></span> *@
+@*                 Remaining Debt: @remainingDebt *@
+@*             </div> *@
+@*             <div class="legend-item"> *@
+@*                 <span class="circle" style="background-color: @remainingDebtColor;"></span> *@
+@*                 Cleared Debt: @clearedDebt *@
+@*             </div> *@
+@*         </div> *@
+@*         @if (hoveredSegment != null) *@
+@*         { *@
+@*             <p>@hoveredSegment</p> <!-- Displays the percentage on hover --> *@
+@*         } *@
+@*     </div> *@
+@* </div> *@
+@* </div> *@
 
 <!-- Pending Debts Section -->
 <div class="row mt-5">
@@ -241,7 +264,7 @@
     private string selectedFilterOrder = "Highest";
     private DateTime? filterStartDate;
     private DateTime? filterDueDate;
-
+    private string hoveredSegment = null;
     private List<SmartFlow.Models.Debt> pendingDebts = new List<SmartFlow.Models.Debt>();
 
     protected override async Task OnInitializedAsync()
