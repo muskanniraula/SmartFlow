@@ -66,13 +66,6 @@ namespace SmartFlow.Services
         }
 
         /// Defining a method to create a new user as per the model's properties
-        /// <param name="userId">User's ID</param>
-        /// <param name="username">User's Name</param>
-        /// <param name="email">User's Email</param>
-        /// <param name="password">User's Password</param>
-        /// <param name="role">User's Role</param>
-        /// <returns>An updated list of user with a new created user</returns>
-        /// <exception cref="Exception"></exception>
         public List<User> Create(Guid userId, string Username, string Password, PreferredCurrency currency)
         {
             Username = Username.Trim();

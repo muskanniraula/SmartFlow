@@ -37,16 +37,16 @@ namespace SmartFlow.Services
 
                 var newDebt = new Debt
                 {
-                    Id = debts.Any() ? debts.Max(d => d.Id) + 1 : 1, // Generate a unique ID
+                    Id = debts.Any() ? debts.Max(d => d.Id) + 1 : 1,
                     Name = debt.Name,
                     Source = debt.Source,
                     Amount = debt.Amount,
-                    StartDate = debt.StartDate, // Automatically set StartDate
+                    StartDate = debt.StartDate,
                     DueDate = debt.DueDate,
                     ClearedDate = debt.ClearedDate,
                     Category = debt.Category,
                     Status = debt.Status,
-                    Type = debt.Type // Ensure Type is being assigned here
+                    Type = debt.Type
                 };
 
                 debts.Add(newDebt);

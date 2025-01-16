@@ -435,56 +435,6 @@
     }
 
 
-
-
-    // private  void async AddTransaction()
-    // {
-    //     try
-    //     {
-    //         if (string.IsNullOrEmpty(newtransaction.Type) || string.IsNullOrEmpty(newtransaction.Name) || (newtransaction.Amount <= 0))
-    //         {
-    //             ErrorMessage = "Empty Field. Please select a type.";
-    //             return;
-    //         }
-
-    //         if (newtransaction.Type == "Expense")
-    //         {
-    //             if (totalBalance < newtransaction.Amount)
-    //             {
-    //                 ErrorMessage = "Insufficient amount.";
-    //                 return;
-    //             }
-    //         }
-
-    //         if (newtransaction.Type == "Debt")
-    //         {
-    //             if (string.IsNullOrEmpty(newdebt.Source))
-    //             {
-    //                 ErrorMessage = "Please select a debt source.";
-    //                 return;
-    //             }
-
-               
-    //         }
-    //         var transactionResult = await TransactionService.AddTransaction(newtransaction);
-
-    //         if (transactionResult)
-    //         {
-    //             newtransaction = new Models.Transaction();
-    //             newdebt = new Models.Debt();
-    //             CloseModal();
-    //         }
-    //         else
-    //         {
-    //             ErrorMessage = "Failed to add the transaction. Please check the details.";
-    //         }
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         ErrorMessage = "An unexpected error occurred.";
-    //     }
-    // }
-
     private void CalculateTotals()
     {
         TotalInflow = transactions.Where(t => t.Type == "Credit").Sum(t => t.Amount);
@@ -506,8 +456,6 @@
     {
         TotalTransactions = transactions.Count;
     }
-
-
 
 
     private void ShowLogoutConfirmation()

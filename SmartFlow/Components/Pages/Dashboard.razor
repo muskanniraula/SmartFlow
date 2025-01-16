@@ -209,7 +209,8 @@
                     </select>
                 </div>
                 <button @onclick="FilterTopTransactions" class="btn btn-primary" style="width: 300px;">Apply Filter</button>
-
+                <button @onclick="ClearTopTransactionsFilter" class="btn btn-outline-secondary" style="width: 300px;">Clear</button>
+  
 
             </div>
         </div>
@@ -370,6 +371,15 @@
         }
 
         StateHasChanged(); // Refresh UI
+    }
+    private void ClearTopTransactionsFilter()
+    {
+        // Reset filter values to default
+        selectedFilterType = "Inflow";
+        selectedFilterOrder = "Highest";
+
+        // Refresh the transaction list
+        FilterTopTransactions();
     }
 
     private void FilterPendingDebts()

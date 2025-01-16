@@ -1,9 +1,7 @@
-﻿// Models/Transaction.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 
-// Models/Debt.cs
 namespace SmartFlow.Models
 {
     public class Debt
@@ -18,7 +16,7 @@ namespace SmartFlow.Models
         public DateOnly? ClearedDate { get; set; }
 
         public string Category { get; set; }
-        public string Status { get; set; } // Pending, Overdue, Cleared
+        public string Status { get; set; }
         public string Type { get; set; }
     }
 }

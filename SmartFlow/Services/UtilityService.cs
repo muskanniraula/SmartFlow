@@ -47,10 +47,8 @@ namespace SmartFlow.Services
             return CryptographicOperations.FixedTimeEquals(inputHash, hash);
         }
 
-        /// <summary>
         /// Initializes a method to retrieve the directory path to store all the records and logs.
-        /// </summary>
-        /// <returns>Path of the directory that holds all the application data</returns>
+
         public static string GetAppDirectoryPath()
         {
             return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SmartFlow");
@@ -76,9 +74,6 @@ namespace SmartFlow.Services
             return Path.Combine(GetAppDirectoryPath(), "debts.json");
         }
 
-        /// <summary>
-        /// Ensures that the directory for storing application files exists.
-        /// </summary>
         public static void EnsureDirectoryExists()
         {
             var directoryPath = GetAppDirectoryPath();
