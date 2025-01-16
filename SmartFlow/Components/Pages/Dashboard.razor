@@ -36,7 +36,7 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Total Balance</h5>
+                <h5 class="card-title">Current Balance</h5>
                 <p class="card-text">@GlobalState.CurrentUser?.currency @totalBalance</p>
             </div>
         </div>
@@ -94,7 +94,65 @@
         </div>
     </div>
 </div>
-<!-- Filter Section -->
+
+
+<!-- charts Section -->
+<div class="row">
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h5>Debt Overview</h5>
+            <MudChart ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@data" InputLabels="@labels" />
+
+            </div>
+        </div>
+ </div>
+
+<!-- pending debts Section -->
+<!-- Pending Debts Section -->
+<div class="row mt-5">
+    <div class="col-md-12">
+        <h4>Pending Debts</h4>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Source</th>
+                    <th>Amount</th>
+                    <th>Start Date</th>
+                    <th>Due Date</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (pendingDebts.Any())
+                {
+                    @foreach (var debt in pendingDebts)
+                    {
+                        <tr>
+                            <td>@debt.Name</td>
+                            <td>@debt.Source</td>
+                            <td>@GlobalState.CurrentUser?.currency @debt.Amount</td>
+                            <td>@debt.StartDate.ToShortDateString()</td>
+                            <td>@debt.DueDate.ToShortDateString()</td>
+                            <td>@debt.Category</td>
+                            <td>@debt.Status</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6">No pending debts found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Filter Section for top 5 transactions -->
 <h4>Filter Top 5 Transactions/Debts</h4>
 <div class="d-flex align-items-center my-3">
     <label for="filterType" class="mr-2">Filter By:</label>
@@ -148,6 +206,9 @@
 
 
 @code {
+    private double[] data = new double[] { };
+
+    private string[] labels = new string[] { "Cleared Debt", "Remaining Debt"};
     private decimal totalBalance;
     private decimal totalInflows;
     private decimal totalOutflows;
@@ -162,9 +223,13 @@
     private string selectedFilterType = "Inflow";
     private string selectedFilterOrder = "Highest";
 
+    private List<SmartFlow.Models.Debt> pendingDebts = new List<SmartFlow.Models.Debt>();
+
     protected override async Task OnInitializedAsync()
     {
         transactions = TransactionService.GetAllTransactions();
+        var allDebts = DebtService.GetAllDebts(); // Fetch all debts
+        pendingDebts = allDebts.Where(d => d.Status == "Pending").ToList();
         await CalculateDebtTotals(); // Call DebtService to calculate debt totals
         CalculateTotals();
         FilterTopTransactions();
@@ -189,7 +254,11 @@
         totalDebt = debts.Sum(d => d.Amount);
         clearedDebt = debts.Where(d => d.Status == "Cleared").Sum(d => d.Amount);
         remainingDebt = totalDebt - clearedDebt;
+
+        // Update the data array for the pie chart
+        data = new double[] { (double)clearedDebt, (double)remainingDebt };
     }
+
 
     private void FilterTopTransactions()
     {

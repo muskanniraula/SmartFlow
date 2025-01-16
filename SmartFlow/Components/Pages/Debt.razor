@@ -38,7 +38,7 @@
     <div class="col-md-3">
         <div class="card text-white bg-primary">
             <div class="card-body">
-                <h5 class="card-title">Total Balance</h5>
+                <h5 class="card-title">Current Balance</h5>
                 <p class="card-text">@GlobalState.CurrentUser?.currency @TotalBalance</p>
             </div>
         </div>
@@ -161,7 +161,6 @@
                             <select class="form-control" @bind="newDebt.Status">
                                 <option value="Pending">Pending</option>
                                 <option value="Cleared">Cleared</option>
-                                <option value="Failed">Failed</option>
                             </select>
                         </div>
                         <div class="mb-3">
