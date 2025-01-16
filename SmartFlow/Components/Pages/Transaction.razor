@@ -168,19 +168,19 @@
                         </div>
                     }
                     <div class="mb-3">
-                        <label>Name</label>
+                        <label>Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" @bind="newtransaction.Name" />
                     </div>
                     <div class="mb-3">
-                        <label>Amount</label>
+                        <label>Amount <span class="text-danger">*</span></label>
                         <input type="number" class="form-control" @bind="newtransaction.Amount" />
                     </div>
                     <div class="mb-3">
-                        <label>Date</label>
+                        <label>Date <span class="text-danger">*</span></label>
                         <input type="date" class="form-control" @bind="newtransaction.Date" />
                     </div>
                     <div class="mb-3">
-                        <label>Type</label>
+                        <label>Type <span class="text-danger">*</span></label>
                         <select class="form-control" @bind="newtransaction.Type">
                             <option value=""></option>
                             <option value="Credit">Credit</option>
@@ -188,19 +188,20 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label>Category</label>
+                        <label>Category <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" @bind="newtransaction.Category" />
                     </div>
                     <div class="mb-3">
-                        <label>Status</label>
+                        <label>Status <span class="text-danger">*</span></label>
                         <select class="form-control" @bind="newtransaction.Status">
+                            <option value=""></option>
                             <option value="Completed">Completed</option>
                             <option value="Failed">Failed</option>
                             <option value="Pending">Pending</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label>Tags</label>
+                        <label>Tags <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" @bind="newtransaction.Tags" />
                     </div>
                     <div class="mb-3">
@@ -267,54 +268,84 @@
     }
 
     private async Task AddTransaction()
-{
-    try
     {
-        // Validate inputs
-        if (string.IsNullOrEmpty(newtransaction.Type) ||
-            string.IsNullOrEmpty(newtransaction.Name) ||
-            newtransaction.Amount <= 0)
+        try
         {
-            ErrorMessage = "Please fill in all required fields correctly.";
-            StateHasChanged(); // Update UI
-            return;
+            // Validate inputs
+            if (string.IsNullOrEmpty(newtransaction.Name))
+            {
+                ErrorMessage = "Name is required.";
+                StateHasChanged();
+                return;
+            }
+
+            if (newtransaction.Amount <= 0)
+            {
+                ErrorMessage = "Amount must be greater than zero.";
+                StateHasChanged();
+                return;
+            }
+
+            if (string.IsNullOrEmpty(newtransaction.Type))
+            {
+                ErrorMessage = "Type is required.";
+                StateHasChanged();
+                return;
+            }
+
+            if (string.IsNullOrEmpty(newtransaction.Category))
+            {
+                ErrorMessage = "Category is required.";
+                StateHasChanged();
+                return;
+            }
+
+            if (string.IsNullOrEmpty(newtransaction.Status))
+            {
+                ErrorMessage = "Status is required.";
+                StateHasChanged();
+                return;
+            }
+            if (string.IsNullOrEmpty(newtransaction.Tags))
+            {
+                ErrorMessage = "Tags is required.";
+                StateHasChanged();
+                return;
+            }
+            // Check for sufficient balance if it's a debit transaction
+            if (newtransaction.Type == "Debit" && newtransaction.Amount > TotalBalance)
+            {
+                ErrorMessage = "Insufficient balance for this transaction.";
+                StateHasChanged();
+                return;
+            }
+
+            // Attempt to add the transaction
+            var success = await TransactionService.AddTransaction(newtransaction);
+
+            if (success)
+            {
+                transactions = TransactionService.GetAllTransactions();
+                FilteredTransactions = transactions;
+                CalculateTotals();
+                UpdateDashboardMetrics();
+
+                CloseModal();
+                newtransaction = new Models.Transaction { Date = DateTime.Now };
+            }
+            else
+            {
+                ErrorMessage = "Failed to add the transaction. Please try again.";
+                StateHasChanged();
+            }
         }
-
-        // Check for sufficient balance if it's a debit transaction
-        if (newtransaction.Type == "Debit" && newtransaction.Amount > TotalBalance)
+        catch (Exception ex)
         {
-            ErrorMessage = "Insufficient balance for this transaction.";
-            StateHasChanged(); // Update UI
-            return;
-        }
-
-        // Attempt to add the transaction via the service
-        var success = await TransactionService.AddTransaction(newtransaction);
-
-        if (success)
-        {
-            // Refresh the transaction list and recalculate totals
-            transactions = TransactionService.GetAllTransactions();
-            FilteredTransactions = transactions;
-            CalculateTotals();
-            UpdateDashboardMetrics();
-
-            // Close the modal and reset fields
-            CloseModal();
-            newtransaction = new Models.Transaction { Date = DateTime.Now };
-        }
-        else
-        {
-            ErrorMessage = "Failed to add the transaction. Please try again.";
-            StateHasChanged(); // Update UI
+            ErrorMessage = "An unexpected error occurred: " + ex.Message;
+            StateHasChanged();
         }
     }
-    catch (Exception ex)
-    {
-        ErrorMessage = "An unexpected error occurred: " + ex.Message;
-        StateHasChanged(); // Update UI
-    }
-}
+
 
 
 

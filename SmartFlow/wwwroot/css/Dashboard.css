@@ -76,6 +76,7 @@ h4 {
     font-weight: 500;
     margin: 0;
 }
+
 /* Chart Section */
 .chart-section {
     margin: 2rem 0;
@@ -195,7 +196,7 @@ h4 {
     font-size: 0.875rem;
     border-radius: 6px;
     transition: all 0.2s ease;
-    width:300px;
+/*    width:300px;*/
     height: 38px; /* Match the height of select inputs */
 }
 
@@ -203,7 +204,8 @@ h4 {
     background-color: #2D3748;
     border: none;
     color: white;
-    width:300px;
+        padding: 0.5rem 1rem;
+/*    width:300px;*/
 }
 
     .btn-primary:hover {

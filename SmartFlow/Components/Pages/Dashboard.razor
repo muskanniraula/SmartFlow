@@ -103,8 +103,8 @@
                                 <label for="dueDate">End Date:</label>
                                 <InputDate @bind-Value="filterDueDate" class="form-control" id="dueDate" />
                             </div>
-                            <button class="btn btn-primary" @onclick="FilterPieChartData">Apply Filter</button>
-                            <button class="btn btn-outline-secondary" @onclick="ClearPieChartFilters">Clear</button>
+                            <button class="btn btn-primary" @onclick="FilterPieChartData" style="width: 300px;">Apply Filter</button>
+                            <button class="btn btn-outline-secondary" @onclick="ClearPieChartFilters" style="width: 300px;">Clear</button>
                         </div>
                     </div>
                     <MudChart ChartType="ChartType.Pie" Width="300px" Height="300px" InputData="@data" />
@@ -142,8 +142,9 @@
                     <label for="dueDate">Due Date:</label>
                     <InputDate @bind-Value="filterDueDate" class="form-control" id="dueDate" />
                 </div>
-                <button class="btn btn-primary" @onclick="FilterPendingDebts">Apply Filter</button>
-                <button class="btn btn-outline-secondary" @onclick="ClearFilters">Clear</button>
+                <button class="btn btn-primary" @onclick="FilterPendingDebts" style="width: 300px;">Apply Filter</button>
+                <button class="btn btn-outline-secondary" @onclick="ClearFilters" style="width: 300px;">Clear</button>
+
             </div>
         </div>
     </div>
@@ -207,7 +208,8 @@
                         <option value="Lowest">Lowest</option>
                     </select>
                 </div>
-                <button @onclick="FilterTopTransactions" class="btn btn-primary">Apply Filter</button>
+                <button @onclick="FilterTopTransactions" class="btn btn-primary" style="width: 300px;">Apply Filter</button>
+
                 
             </div>
         </div>
