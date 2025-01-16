@@ -144,10 +144,11 @@
                             <label>Amount</label>
                             <input type="number" class="form-control" @bind="newDebt.Amount" />
                         </div>
-                        <div class="mb-3">
-                            <label>Start Date</label>
-                            <input type="date" class="form-control" @bind="newDebt.StartDate" />
-                        </div>
+                    <div class="mb-3">
+                        <label>Start Date</label>
+                        <input type="date" class="form-control" @bind="newDebt.StartDate" />
+                    </div>
+
                         <div class="mb-3">
                             <label>Due Date</label>
                             <input type="date" class="form-control" @bind="newDebt.DueDate" />
@@ -254,6 +255,7 @@
     {
         debts = DebtService.GetAllDebts();
         transactions = TransactionService.GetAllTransactions(); // Fetch transactions here
+
     }
 
     private void ShowLogoutConfirmation()
@@ -273,13 +275,15 @@
     {
         newDebt = new Models.Debt
             {
-                StartDate = DateTime.Now,
-                DueDate = DateTime.Now.AddDays(30),
+                StartDate = DateTime.Now, // Set to current date
+                DueDate = DateTime.Now.AddDays(30), // Default to 30 days ahead
                 Status = "Pending",
                 Type = "Debt"
             };
         showModal = true;
     }
+
+
 
     private void CloseModal()
     {
@@ -290,12 +294,15 @@
     {
         if (ValidateDebt(newDebt))
         {
-            await DebtService.AddDebtAsync(newDebt); // Add debt asynchronously
-            debts = DebtService.GetAllDebts(); // Refresh the debts list
-            StateHasChanged(); // Ensure the UI updates after adding the debt
-            CloseModal();
+            await DebtService.AddDebtAsync(newDebt); // Add the new debt to the service
+            debts = DebtService.GetAllDebts(); // Refresh the list after adding the debt
+            StateHasChanged(); // Force UI update
+            CloseModal(); // Close the modal after adding
         }
     }
+
+
+
 
 
     private void EditClearedDate(Models.Debt debt)

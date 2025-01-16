@@ -33,85 +33,102 @@
 
 <div class="row">
     <!-- Total Balance Card -->
-    <div class="col-md-4">
+    <div class="col-md-2">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Current Balance</h5>
+                <h6 class="card-title">Current Balance</h6>
                 <p class="card-text">@GlobalState.CurrentUser?.currency @totalBalance</p>
             </div>
         </div>
     </div>
 
     <!-- Total Inflows Card -->
-    <div class="col-md-4">
+    <div class="col-md-2">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Total Inflows</h5>
+                <h6 class="card-title">Total Inflows</h6>
                 <p class="card-text">@GlobalState.CurrentUser?.currency @totalInflows</p>
             </div>
         </div>
     </div>
 
     <!-- Total Outflows Card -->
-    <div class="col-md-4">
+    <div class="col-md-2">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Total Outflows</h5>
+                <h6 class="card-title">Total Outflows</h6>
                 <p class="card-text">@GlobalState.CurrentUser?.currency @totalOutflows</p>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row">
+
+
     <!-- Total Debt Card -->
-    <div class="col-md-4">
+    <div class="col-md-2">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Total Debt</h5>
+                <h6 class="card-title">Total Debt</h6>
                 <p class="card-text">@GlobalState.CurrentUser?.currency @totalDebt</p>
             </div>
         </div>
     </div>
 
     <!-- Cleared Debt Card -->
-    <div class="col-md-4">
+    <div class="col-md-2">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Cleared Debt</h5>
+                <h6 class="card-title">Cleared Debt</h6>
                 <p class="card-text">@GlobalState.CurrentUser?.currency @clearedDebt</p>
             </div>
         </div>
     </div>
 
     <!-- Remaining Debt Card -->
-    <div class="col-md-4">
+    <div class="col-md-2">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Remaining Debt</h5>
+                <h6 class="card-title">Remaining Debt</h6>
                 <p class="card-text">@GlobalState.CurrentUser?.currency @remainingDebt</p>
             </div>
         </div>
     </div>
 </div>
 
-
 <!-- charts Section -->
 <div class="row">
         <div class="col-md-6">
             <div class="dashboard-card">
                 <h5>Debt Overview</h5>
-            <MudChart ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@data" InputLabels="@labels" />
-
+            <MudChart ChartType="ChartType.Pie" Width="200px" Height="200px" InputData="@data" InputLabels="@labels" />
             </div>
         </div>
  </div>
 
-<!-- pending debts Section -->
+
 <!-- Pending Debts Section -->
 <div class="row mt-5">
     <div class="col-md-12">
         <h4>Pending Debts</h4>
+        <!-- Filter Section for pending debt -->
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <label for="startDate">Start Date:</label>
+                <InputDate @bind-Value="filterStartDate" class="form-control" id="startDate" />
+            </div>
+            <div class="col-md-6">
+                <label for="dueDate">Due Date:</label>
+                <InputDate @bind-Value="filterDueDate" class="form-control" id="dueDate" />
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <button class="btn btn-primary" @onclick="FilterPendingDebts">Apply Filter</button>
+                <button class="btn btn-secondary ml-2" @onclick="ClearFilters">Clear Filters</button>
+            </div>
+        </div>
+
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -222,6 +239,8 @@
     // Filter options
     private string selectedFilterType = "Inflow";
     private string selectedFilterOrder = "Highest";
+    private DateTime? filterStartDate;
+    private DateTime? filterDueDate;
 
     private List<SmartFlow.Models.Debt> pendingDebts = new List<SmartFlow.Models.Debt>();
 
@@ -267,6 +286,7 @@
         {
             "Inflow" => transactions.Where(t => t.Type == "Credit"),
             "Outflow" => transactions.Where(t => t.Type == "Debit"),
+            "Debts" => transactions.Where(d => d.Type == "Debt"),
             // "Debt" => debts.Where(d => d.Type == "Debt"),
             _ => transactions
         };
@@ -283,6 +303,24 @@
 
         StateHasChanged(); // Refresh UI
     }
+
+    private void FilterPendingDebts()
+    {
+        var allDebts = DebtService.GetAllDebts(); // Re-fetch all debts
+        pendingDebts = allDebts
+            .Where(d => d.Status == "Pending"
+                        && (!filterStartDate.HasValue || d.StartDate >= filterStartDate)
+                        && (!filterDueDate.HasValue || d.DueDate <= filterDueDate))
+            .ToList();
+    }
+    private void ClearFilters()
+    {
+        filterStartDate = null;
+        filterDueDate = null;
+        var allDebts = DebtService.GetAllDebts();
+        pendingDebts = allDebts.Where(d => d.Status == "Pending").ToList();
+    }
+
     private void ShowLogoutConfirmation()
     {
         IsLogout = true;
@@ -314,8 +352,4 @@
     {
         Nav.NavigateTo("/");
     }
-    // private void ShowLogoutConfirmation()
-    // {
-    //     IsLogout = true;
-    // }
 }
