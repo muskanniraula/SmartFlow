@@ -1,9 +1,12 @@
 @page "/dashboard"
+<link href="css/Dashboard.css" rel="stylesheet" />
 
-<nav class="nav">
+<nav class="navbar">
+    <div class="nav">
     <a class="nav-link active" @onclick="NavigateToDashboard">Dashboard</a>
     <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
     <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
+    </div>
     <div class="logout">
         <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
     </div>
@@ -31,80 +34,80 @@
 
 <h3>Dashboard</h3>
 
+<!-- Stats Cards -->
 <div class="row">
-    <!-- Total Balance Card -->
     <div class="col-md-2">
-        <div class="card">
+        <div class="card-balance">
             <div class="card-body">
-                <h6 class="card-title">Current Balance</h6>
-                <p class="card-text">@GlobalState.CurrentUser?.currency @totalBalance</p>
+                <h6 class="card-title-balance">Current Balance</h6>
+                <p class="card-text-balance h4">@GlobalState.CurrentUser?.currency @totalBalance</p>
             </div>
         </div>
     </div>
-
-    <!-- Total Inflows Card -->
     <div class="col-md-2">
         <div class="card">
             <div class="card-body">
-                <h6 class="card-title">Total Inflows</h6>
-                <p class="card-text">@GlobalState.CurrentUser?.currency @totalInflows</p>
+                <h6 class="card-title">Total Income</h6>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @totalInflows</p>
             </div>
         </div>
     </div>
-
-    <!-- Total Outflows Card -->
     <div class="col-md-2">
         <div class="card">
             <div class="card-body">
-                <h6 class="card-title">Total Outflows</h6>
-                <p class="card-text">@GlobalState.CurrentUser?.currency @totalOutflows</p>
+                <h6 class="card-title">Total Expense</h6>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @totalOutflows</p>
             </div>
         </div>
     </div>
-
-
-
-    <!-- Total Debt Card -->
     <div class="col-md-2">
         <div class="card">
             <div class="card-body">
-                <h6 class="card-title">Total Debt</h6>
-                <p class="card-text">@GlobalState.CurrentUser?.currency @totalDebt</p>
+                <h6 class="card-title">Total Debts</h6>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @totalDebt</p>
             </div>
         </div>
     </div>
-
-    <!-- Cleared Debt Card -->
     <div class="col-md-2">
         <div class="card">
             <div class="card-body">
-                <h6 class="card-title">Cleared Debt</h6>
-                <p class="card-text">@GlobalState.CurrentUser?.currency @clearedDebt</p>
+                <h6 class="card-title">Cleared Debts</h6>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @clearedDebt</p>
             </div>
         </div>
     </div>
-
-    <!-- Remaining Debt Card -->
     <div class="col-md-2">
         <div class="card">
             <div class="card-body">
-                <h6 class="card-title">Remaining Debt</h6>
-                <p class="card-text">@GlobalState.CurrentUser?.currency @remainingDebt</p>
+                <h6 class="card-title">Remaining Debts</h6>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @remainingDebt</p>
             </div>
         </div>
     </div>
 </div>
 
 <!-- charts Section -->
-<div class="row">
+<div class="chart-section">
+    <div class="row">
         <div class="col-md-6">
-            <div class="dashboard-card">
-                <h5>Debt Overview</h5>
-            <MudChart ChartType="ChartType.Pie" Width="200px" Height="200px" InputData="@data" InputLabels="@labels" />
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5>Title</h5>
+                        <select class="form-control form-control-sm w-auto">
+                            <option>Today</option>
+                            <option>This Week</option>
+                            <option>This Month</option>
+                        </select>
+                    </div>
+                    <MudChart ChartType="ChartType.Pie" Width="300px" Height="300px" InputData="@data" InputLabels="@labels" />
+                </div>
             </div>
         </div>
+    </div>
+</div>
 
- </div>
+
 <!-- Debt Overview Pie Chart Section -->
 @* <div class="row"> *@
 @* <div class="col-md-6"> *@
@@ -130,40 +133,37 @@
 @* </div> *@
 
 <!-- Pending Debts Section -->
-<div class="row mt-5">
-    <div class="col-md-12">
+<div class="section-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <h4>Pending Debts</h4>
-        <!-- Filter Section for pending debt -->
-
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <label for="startDate">Start Date:</label>
-                <InputDate @bind-Value="filterStartDate" class="form-control" id="startDate" />
-            </div>
-            <div class="col-md-6">
-                <label for="dueDate">Due Date:</label>
-                <InputDate @bind-Value="filterDueDate" class="form-control" id="dueDate" />
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-12">
+        <div class="date-range">
+            <div class="d-flex gap-3 d-flex">
+                <div class="input-group">
+                    <label for="startDate">Start Date:</label>
+                    <InputDate @bind-Value="filterStartDate" class="form-control" id="startDate" />
+                </div>
+                <div class="input-group">
+                    <label for="dueDate">Due Date:</label>
+                    <InputDate @bind-Value="filterDueDate" class="form-control" id="dueDate" />
+                </div>
                 <button class="btn btn-primary" @onclick="FilterPendingDebts">Apply Filter</button>
-                <button class="btn btn-secondary ml-2" @onclick="ClearFilters">Clear Filters</button>
+                <button class="btn btn-outline-secondary" @onclick="ClearFilters">Clear</button>
             </div>
         </div>
+    </div>
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Source</th>
-                    <th>Amount</th>
-                    <th>Start Date</th>
-                    <th>Due Date</th>
-                    <th>Category</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Source</th>
+                <th>Amount</th>
+                <th>Start Date</th>
+                <th>Due Date</th>
+                <th>Category</th>
+                <th>Status</th>
+            </tr>
+        </thead>
             <tbody>
                 @if (pendingDebts.Any())
                 {
@@ -189,31 +189,35 @@
             </tbody>
         </table>
     </div>
-</div>
 
-
-<!-- Filter Section for top 5 transactions -->
-<h4>Filter Top 5 Transactions/Debts</h4>
-<div class="d-flex align-items-center my-3">
-    <label for="filterType" class="mr-2">Filter By:</label>
-    <select id="filterType" @bind="selectedFilterType" class="form-control-sm mr-3">
-        <option value="Inflow">Inflow</option>
-        <option value="Outflow">Outflow</option>
-        <option value="Debt">Debt</option>
-    </select>
-
-    <label for="filterOrder" class="mr-2">Order:</label>
-    <select id="filterOrder" @bind="selectedFilterOrder" class="form-control-sm mr-3">
-        <option value="Highest">Highest</option>
-        <option value="Lowest">Lowest</option>
-    </select>
-
-    <button @onclick="FilterTopTransactions" class="btn btn-primary btn-sm">Apply Filter</button>
-</div>
 
 <!-- Filtered Transactions Table -->
-<h5>Top 5 @selectedFilterType Transactions (@selectedFilterOrder)</h5>
-<table class="table table-striped">
+<div class="section-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>Top 5 Transactions</h4>
+        <div class="date-range">
+            <div class="d-flex gap-3 " >
+                <div class="input-group">
+                    <label for="filterType">Filter By:</label>
+                    <select id="filterType" @bind="selectedFilterType" class="form-control">
+                        <option value="Inflow">Inflow</option>
+                        <option value="Outflow">Outflow</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="filterOrder">Order:</label>
+                    <select id="filterOrder" @bind="selectedFilterOrder" class="form-control">
+                        <option value="Highest">Highest</option>
+                        <option value="Lowest">Lowest</option>
+                    </select>
+                </div>
+                <button @onclick="FilterTopTransactions" class="btn btn-primary">Apply Filter</button>
+                
+            </div>
+        </div>
+    </div>
+    
+<table class="table">
     <thead>
         <tr>
             <th>Name</th>
@@ -243,7 +247,7 @@
         }
     </tbody>
 </table>
-
+</div>
 
 @code {
     private double[] data = new double[] { };
