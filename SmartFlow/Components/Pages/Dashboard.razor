@@ -89,48 +89,44 @@
 <!-- charts Section -->
 <div class="chart-section">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5>Title</h5>
-                        <select class="form-control form-control-sm w-auto">
-                            <option>Today</option>
-                            <option>This Week</option>
-                            <option>This Month</option>
-                        </select>
+                        <h5>Debt Overview</h5>
+                        <div class="date-range d-flex gap-3">
+                            <div class="input-group">
+                                <label for="startDate">Start Date:</label>
+                                <InputDate @bind-Value="filterStartDate" class="form-control" id="startDate" />
+                            </div>
+                            <div class="input-group">
+                                <label for="dueDate">End Date:</label>
+                                <InputDate @bind-Value="filterDueDate" class="form-control" id="dueDate" />
+                            </div>
+                            <button class="btn btn-primary" @onclick="FilterPieChartData">Apply Filter</button>
+                            <button class="btn btn-outline-secondary" @onclick="ClearPieChartFilters">Clear</button>
+                        </div>
                     </div>
-                    <MudChart ChartType="ChartType.Pie" Width="300px" Height="300px" InputData="@data" InputLabels="@labels" />
+                    <MudChart ChartType="ChartType.Pie" Width="300px" Height="300px" InputData="@data" />
+
+                    <!-- Legend Section -->
+                    <div class="mt-4">
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-center">
+                                <span class="circle-indicator" style="background-color: #4079FF;"></span>
+                                <span class="ms-2">Cleared Debt: @GlobalState.CurrentUser?.currency @clearedDebt</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="circle-indicator" style="background-color: #56E8B4;"></span>
+                                <span class="ms-2">Remaining Debt: @GlobalState.CurrentUser?.currency @remainingDebt</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
-<!-- Debt Overview Pie Chart Section -->
-@* <div class="row"> *@
-@* <div class="col-md-6"> *@
-@*     <div class="dashboard-card"> *@
-@*         <h5>Debt Overview</h5> *@
-@*         <MudChart ChartType="ChartType.Pie" Width="200px" Height="200px" InputData="@data" InputLabels="@labels" @onhover="OnChartHover" /> *@
-@*         <div class="chart-legend"> *@
-@*             <div class="legend-item"> *@
-@*                 <span class="circle" style="background-color: @clearedDebtColor;"></span> *@
-@*                 Remaining Debt: @remainingDebt *@
-@*             </div> *@
-@*             <div class="legend-item"> *@
-@*                 <span class="circle" style="background-color: @remainingDebtColor;"></span> *@
-@*                 Cleared Debt: @clearedDebt *@
-@*             </div> *@
-@*         </div> *@
-@*         @if (hoveredSegment != null) *@
-@*         { *@
-@*             <p>@hoveredSegment</p> <!-- Displays the percentage on hover --> *@
-@*         } *@
-@*     </div> *@
-@* </div> *@
-@* </div> *@
 
 <!-- Pending Debts Section -->
 <div class="section-container">
@@ -305,6 +301,42 @@
         data = new double[] { (double)clearedDebt, (double)remainingDebt };
     }
 
+    private void FilterPieChartData()
+    {
+        // Filter debts based on selected date range
+        var filteredDebts = DebtService.GetAllDebts()
+            .Where(d => (!filterStartDate.HasValue || d.StartDate >= filterStartDate)
+                        && (!filterDueDate.HasValue || d.DueDate <= filterDueDate))
+            .ToList();
+
+        // Recalculate debt totals for the filtered data
+        totalDebt = filteredDebts.Sum(d => d.Amount);
+        clearedDebt = filteredDebts.Where(d => d.Status == "Cleared").Sum(d => d.Amount);
+        remainingDebt = totalDebt - clearedDebt;
+
+        // Update the data array for the pie chart
+        data = new double[] { (double)clearedDebt, (double)remainingDebt };
+
+        StateHasChanged(); // Refresh the UI
+    }
+
+    private void ClearPieChartFilters()
+    {
+        // Clear the date range filters
+        filterStartDate = null;
+        filterDueDate = null;
+
+        // Recalculate with all debts
+        var allDebts = DebtService.GetAllDebts();
+        totalDebt = allDebts.Sum(d => d.Amount);
+        clearedDebt = allDebts.Where(d => d.Status == "Cleared").Sum(d => d.Amount);
+        remainingDebt = totalDebt - clearedDebt;
+
+        // Update the data array for the pie chart
+        data = new double[] { (double)clearedDebt, (double)remainingDebt };
+
+        StateHasChanged(); // Refresh the UI
+    }
 
     private void FilterTopTransactions()
     {
