@@ -9,13 +9,15 @@
 }
 
 .nav-link {
-    color: #666;
+    color: #B3B3B3;
     text-decoration: none;
     margin-right: 2rem;
+    padding: 14px;
 }
 
     .nav-link.active {
         color: #000;
+        border-bottom: 2px solid #3C3C3C;
         font-weight: 500;
     }
 
@@ -32,7 +34,7 @@ h3 {
 
 /* Stats cards */
 .card {
-    background: white;
+    background: #FBFBFB;
     border-radius: 8px;
     border: 1px solid #eee;
     padding: 1.5rem;

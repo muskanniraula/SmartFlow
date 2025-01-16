@@ -1,12 +1,12 @@
 @page "/debt"
+<link href="css/Debt.css" rel="stylesheet" />
 
-<head>
-    <link rel="stylesheet" href="css/Debt.css" />
-</head>
-<nav class="nav">
-    <a class="nav-link active" @onclick="NavigateToDashboard">Dashboard</a>
-    <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
-    <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
+<nav class="navbar">
+    <div class="nav">
+        <a class="nav-link" @onclick="NavigateToDashboard">Dashboard</a>
+        <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
+        <a class="nav-link active" @onclick="NavigateToDebt">Debts</a>
+    </div>
     <div class="logout">
         <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
     </div>
@@ -32,63 +32,65 @@
     <div class="modal-backdrop fade show"></div>
 }
 
-<h1><b>Debts</b></h1>
-<button class="btn btn-primary mt-3" @onclick="OpenModal">Add Debt</button>
-<div class="row mt-4">
-    <div class="col-md-3">
-        <div class="card text-white bg-primary">
-            <div class="card-body">
-                <h5 class="card-title">Current Balance</h5>
-                <p class="card-text">@GlobalState.CurrentUser?.currency @TotalBalance</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h5 class="card-title">Total Debt</h5>
-                <p class="card-text">@GlobalState.CurrentUser?.currency @TotalDebt</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-warning">
-            <div class="card-body">
-                <h5 class="card-title">Remaining Debt</h5>
-                <p class="card-text">@GlobalState.CurrentUser?.currency @RemainingDebt</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-info">
-            <div class="card-body">
-                <h5 class="card-title">Cleared Debt</h5>
-                <p class="card-text">@GlobalState.CurrentUser?.currency @ClearedDebt</p>
-            </div>
-        </div>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    
+        <h3>Transactions</h3>
+        <button class="btn btn-primary" @onclick="OpenModal">Add Debt</button>
 </div>
 
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Current Balance</h5>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @TotalBalance</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Debt</h5>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @TotalDebt</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Remaining Debt</h5>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @RemainingDebt</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Cleared Debt</h5>
+                <p class="card-text h4">@GlobalState.CurrentUser?.currency @ClearedDebt</p>
+            </div>
+        </div>
+    </div>
+ </div>
 
-<!-- Search and Date Range Filter -->
-<div class="row mt-4">
-    <div class="col-md-4">
+<!-- Filter controls in one line -->
+<div class="row align-items-end mb-3">
+    <div class="col">
         <input type="text" class="form-control" placeholder="Search by name or source" @bind="searchTerm" />
     </div>
-    <div class="col-md-3">
-        <h6>From</h6>
-        <input type="date" class="form-control" @bind="startDate"/>
+    <div class="col">
+        <label>From Date</label>
+        <input type="date" class="form-control" @bind="startDate" />
     </div>
-    <h6>To</h6>
-    <div class="col-md-3">
-        <input type="date" class="form-control" @bind="endDate"/>
+    <div class="col">
+        <label>To Date</label>
+        <input type="date" class="form-control" @bind="endDate" />
     </div>
-
-    <div class="col-md-2">
-        <button class="btn btn-primary w-100" @onclick="ApplyFilters">Apply Filters</button>
-    </div>
-    <div class="col-md-2">
-        <button class="btn btn-secondary w-100" @onclick="ClearFilters">Clear Filters</button>
+    <div class="col-auto">
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" @onclick="ApplyFilters">Apply Filters</button>
+            <button class="btn btn-outline-secondary" @onclick="ClearFilters">Clear Filters</button>
+        </div>
     </div>
 </div>
 
