@@ -3,9 +3,9 @@
 
 <nav class="navbar">
     <div class="nav">
-    <a class="nav-link active" @onclick="NavigateToDashboard">Dashboard</a>
-    <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
-    <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
+        <a class="nav-link active" @onclick="NavigateToDashboard">Dashboard</a>
+        <a class="nav-link" @onclick="NavigateToTransaction">Transactions</a>
+        <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
     </div>
     <div class="logout">
         <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
@@ -161,31 +161,31 @@
                 <th>Status</th>
             </tr>
         </thead>
-            <tbody>
-                @if (pendingDebts.Any())
-                {
-                    @foreach (var debt in pendingDebts)
-                    {
-                        <tr>
-                            <td>@debt.Name</td>
-                            <td>@debt.Source</td>
-                            <td>@GlobalState.CurrentUser?.currency @debt.Amount</td>
-                            <td>@debt.StartDate.ToShortDateString()</td>
-                            <td>@debt.DueDate.ToShortDateString()</td>
-                            <td>@debt.Category</td>
-                            <td>@debt.Status</td>
-                        </tr>
-                    }
-                }
-                else
+        <tbody>
+            @if (pendingDebts.Any())
+            {
+                @foreach (var debt in pendingDebts)
                 {
                     <tr>
-                        <td colspan="6">No pending debts found.</td>
+                        <td>@debt.Name</td>
+                        <td>@debt.Source</td>
+                        <td>@GlobalState.CurrentUser?.currency @debt.Amount</td>
+                        <td>@debt.StartDate.ToShortDateString()</td>
+                        <td>@debt.DueDate.ToShortDateString()</td>
+                        <td>@debt.Category</td>
+                        <td>@debt.Status</td>
                     </tr>
                 }
-            </tbody>
-        </table>
-    </div>
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6">No pending debts found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 
 <!-- Filtered Transactions Table -->
@@ -210,41 +210,41 @@
                 </div>
                 <button @onclick="FilterTopTransactions" class="btn btn-primary" style="width: 300px;">Apply Filter</button>
 
-                
+
             </div>
         </div>
     </div>
-    
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Category</th>
-            <th>Status</th>
-            <th>Tags</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
 
-        @foreach (var transaction in filteredTransactions)
-        {
+    <table class="table">
+        <thead>
             <tr>
-                <td>@transaction.Name</td>
-                <td>@GlobalState.CurrentUser?.currency @transaction.Amount</td>
-                <td>@transaction.Date.ToShortDateString()</td>
-                <td>@transaction.Type</td>
-                <td>@transaction.Category</td>
-                <td>@transaction.Status</td>
-                <td>@transaction.Tags</td>
-                <td>@transaction.Notes</td>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Tags</th>
+                <th>Notes</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+
+            @foreach (var transaction in filteredTransactions)
+            {
+                <tr>
+                    <td>@transaction.Name</td>
+                    <td>@GlobalState.CurrentUser?.currency @transaction.Amount</td>
+                    <td>@transaction.Date.ToShortDateString()</td>
+                    <td>@transaction.Type</td>
+                    <td>@transaction.Category</td>
+                    <td>@transaction.Status</td>
+                    <td>@transaction.Tags</td>
+                    <td>@transaction.Notes</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
 @code {
@@ -259,8 +259,13 @@
     private decimal remainingDebt;
     private bool IsLogout;
     private List<Models.Transaction> transactions = new List<Models.Transaction>();
-    private List<Debt> debts = new List<Debt>(); // Store debts separately
+    private List<Models.Debt> debts = new List<Models.Debt>(); // Store debts separately
     private List<Models.Transaction> filteredTransactions = new List<Models.Transaction>();
+
+    private decimal TotalDebt;
+    private decimal ClearedDebt;
+    private decimal RemainingDebt;
+
     // Filter options
     private string selectedFilterType = "Inflow";
     private string selectedFilterOrder = "Highest";
@@ -272,8 +277,8 @@
     protected override async Task OnInitializedAsync()
     {
         transactions = TransactionService.GetAllTransactions();
-        var allDebts = DebtService.GetAllDebts(); // Fetch all debts
-        pendingDebts = allDebts.Where(d => d.Status == "Pending").ToList();
+        debts = DebtService.GetAllDebts(); // Fetch all debts
+        pendingDebts = debts.Where(d => d.Status == "Pending").ToList();
         await CalculateDebtTotals(); // Call DebtService to calculate debt totals
         CalculateTotals();
         FilterTopTransactions();
@@ -286,7 +291,9 @@
         totalOutflows = transactions.Where(t => t.Type == "Debit").Sum(t => t.Amount);
 
         // Calculate the total balance as the difference between total inflows and total outflows
-        totalBalance = totalInflows - totalOutflows;
+
+
+        totalBalance = totalInflows + remainingDebt - totalOutflows;
     }
 
     private async Task CalculateDebtTotals()

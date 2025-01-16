@@ -80,7 +80,7 @@
     </div>
     <div class="col">
         <label>From Date</label>
-        <input type="date" class="form-control" @bind="startDate" />
+        <input type="date" class="form-control" @bind="startDate" / >
     </div>
     <div class="col">
         <label>To Date</label>
@@ -264,7 +264,7 @@
     .Sum(t => t.Amount) -
     transactions
     .Where(t => t.Type == "Debit") // Consider only outflows (debits)
-    .Sum(t => t.Amount);
+    .Sum(t => t.Amount) + RemainingDebt;
 
     private List<Models.Debt> filteredDebts => debts
     .Where(d => (string.IsNullOrEmpty(searchTerm) ||
@@ -382,8 +382,6 @@
         }
     }
     private bool showErrorPopup = false;
-
-
 
     private void CloseErrorPopup()
     {

@@ -41,7 +41,7 @@ namespace SmartFlow.Services
                     Name = debt.Name,
                     Source = debt.Source,
                     Amount = debt.Amount,
-                    StartDate = DateTime.Now, // Automatically set StartDate
+                    StartDate = debt.StartDate, // Automatically set StartDate
                     DueDate = debt.DueDate,
                     ClearedDate = debt.ClearedDate,
                     Category = debt.Category,

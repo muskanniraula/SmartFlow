@@ -3,9 +3,9 @@
 
 <nav class="navbar">
     <div class="nav">
-    <a class="nav-link" @onclick="NavigateToDashboard">Dashboard</a>
+        <a class="nav-link" @onclick="NavigateToDashboard">Dashboard</a>
         <a class="nav-link active" @onclick="NavigateToTransaction">Transactions</a>
-    <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
+        <a class="nav-link" @onclick="NavigateToDebt">Debts</a>
     </div>
     <div class="logout">
         <button type="button" class="btn w-100" @onclick="ShowLogoutConfirmation">Logout</button>
@@ -37,7 +37,7 @@
     <button class="btn btn-primary" @onclick="OpenModal">Add Transaction</button>
 </div>
 <div class="row mb-4">
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Total Transactions</h5>
@@ -45,15 +45,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Current Balance</h5>
-                <p class="card-text h4">@GlobalState.CurrentUser?.currency @TotalBalance</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Total Inflow</h5>
@@ -61,7 +53,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Total Outflow</h5>
@@ -240,6 +232,11 @@
     private Models.Transaction newtransaction = new();
     private Models.Debt newdebt = new();
     private List<Models.Transaction> transactions = new List<Models.Transaction>();
+    private List<Models.Debt> debts = new List<Models.Debt>();
+
+    private decimal ClearedDebt;
+    private decimal RemainingDebt;
+
     private List<Models.Transaction> FilteredTransactions = new List<Models.Transaction>();
     private bool isModalVisible = false;
 
@@ -253,13 +250,14 @@
 
 
 
-    
+
     protected override async Task OnInitializedAsync()
     {
         transactions = TransactionService.GetAllTransactions();  // Use async method here
         FilteredTransactions = transactions;
         CalculateTotals();
         UpdateDashboardMetrics();
+        CalculateDebtTotals();
     }
 
     private void OpenAddTransactionModal()
@@ -486,12 +484,24 @@
     //         ErrorMessage = "An unexpected error occurred.";
     //     }
     // }
+
     private void CalculateTotals()
     {
         TotalInflow = transactions.Where(t => t.Type == "Credit").Sum(t => t.Amount);
         TotalOutflow = transactions.Where(t => t.Type == "Debit").Sum(t => t.Amount);
-        TotalBalance = TotalInflow - TotalOutflow;
+        TotalBalance = TotalInflow + RemainingDebt - TotalOutflow;
     }
+    private async Task CalculateDebtTotals()
+    {
+        // Get all debts from the DebtService
+        var debts = DebtService.GetAllDebts();
+
+        // Calculate total debt, cleared debt, and remaining debt
+        totalDebt = debts.Sum(d => d.Amount);
+        ClearedDebt = debts.Where(d => d.Status == "Cleared").Sum(d => d.Amount);
+        RemainingDebt = totalDebt - ClearedDebt;
+    }
+
     private void UpdateDashboardMetrics()
     {
         TotalTransactions = transactions.Count;
